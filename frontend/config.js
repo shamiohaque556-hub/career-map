@@ -3,7 +3,7 @@
 //  Before deploying: replace PROD_BACKEND with your real backend
 //  URL (e.g. "https://careermap-api.onrender.com/api").
 // ============================================================
-const PROD_BACKEND = "https://YOUR-BACKEND.onrender.com/api"; // <-- CHANGE ME
+const PROD_BACKEND = "https://career-map-y3k1.onrender.com/api"; // <-- CHANGE ME
 
 const Config = {
   BACKEND_URL:
