@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareerMAP — Your Results</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#f4f5f7;--card:#ffffff;--text:#111118;--muted:#646473;
+      --gold:#b38b22;--gold-soft:rgba(179,139,34,0.08);--border:#e2e4e9;
+      --red:#b54747;--red-bg:#fff5f5;--green:#16a34a;--ink:#1a1a22;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px;}
+    .nav{padding:20px 36px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:0;z-index:10;}
+    .brand{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;}
+    .nav-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+    .container{max-width:780px;margin:0 auto;padding:48px 22px 0;}
+
+    .header{text-align:center;margin-bottom:14px;}
+    .header-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:12px;}
+    .header-title{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;line-height:1.12;margin-bottom:14px;}
+    .ecosystem-tag{display:inline-block;padding:7px 16px;background:var(--gold-soft);color:var(--gold);border:1px solid rgba(179,139,34,0.4);border-radius:6px;font-size:13px;font-weight:700;}
+    .intro-line{font-size:15px;color:var(--muted);line-height:1.6;max-width:560px;margin:18px auto 0;}
+
+    .section-label{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin:46px 0 6px;}
+    .section-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px;}
+
+    /* trait card */
+    .trait{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px 22px;margin-bottom:14px;}
+    .trait-top{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+    .trait-icon{font-size:22px;}
+    .trait-name{font-weight:700;font-size:17px;flex:1;}
+    .trait-level{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:4px 11px;border-radius:20px;white-space:nowrap;}
+    .lvl-high{background:var(--gold-soft);color:var(--gold);}
+    .lvl-mid{background:#eef0f3;color:var(--muted);}
+    .lvl-low{background:#eef0f3;color:var(--muted);}
+    .trait-bar-bg{height:8px;background:var(--border);border-radius:5px;overflow:hidden;margin:12px 0 14px;}
+    .trait-bar-fill{height:100%;background:var(--gold);border-radius:5px;width:0;transition:width .7s ease;}
+    .trait-desc{font-size:14px;line-height:1.65;color:#33333f;}
+    .trait-desc strong{color:var(--text);}
+
+    /* rich analysis chapters */
+    .analysis-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:30px;margin-bottom:14px;}
+    .chapter{margin-bottom:28px;}
+    .chapter:last-child{margin-bottom:0;}
+    .ch-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+    .ch-label.danger{color:var(--red);}
+    .ch-heading{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:9px;}
+    .ch-text{font-size:14.5px;line-height:1.75;color:#2a2a36;}
+    .ch-text.trap{color:#7a2020;}
+    .divider{border:none;border-top:1px solid var(--border);margin:26px 0;}
+
+    /* predictions */
+    .pred-block{border:1px solid var(--border);border-radius:11px;padding:18px 20px;margin-bottom:14px;}
+    .pred-block:last-child{margin-bottom:0;}
+    .pred-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;}
+    .pred-text{font-size:14px;font-style:italic;line-height:1.6;margin-bottom:14px;color:var(--text);}
+    .pred-rating{display:flex;gap:8px;}
+    .pred-btn{flex:1;padding:9px 4px;border:1px solid var(--border);border-radius:7px;background:#fff;font-size:12.5px;font-weight:700;cursor:pointer;transition:0.15s;color:var(--muted);font-family:inherit;}
+    .pred-btn:hover{border-color:var(--text);color:var(--text);}
+    .pred-btn.sel-accurate{background:var(--green);color:#fff;border-color:var(--green);}
+    .pred-btn.sel-partial{background:var(--gold-soft);color:var(--gold);border-color:var(--gold);}
+    .pred-btn.sel-off{background:var(--red-bg);color:var(--red);border-color:var(--red);}
+
+    /* accuracy */
+    .feedback{margin-top:46px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:34px;text-align:center;}
+    .feedback h2{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px;}
+    .feedback p{font-size:14px;color:var(--muted);max-width:440px;margin:0 auto 24px;line-height:1.6;}
+    .slider-wrap{max-width:420px;margin:0 auto 28px;}
+    input[type=range]{width:100%;accent-color:var(--gold);margin-bottom:10px;}
+    .slider-ends{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--muted);}
+    .slider-val{font-size:26px;font-weight:900;color:var(--gold);margin-top:10px;}
+    .btn-submit{padding:15px 42px;background:var(--ink);color:#fff;border:none;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;}
+    .btn-submit:hover{background:var(--gold);}
+    .btn-submit:disabled{background:var(--border);cursor:not-allowed;color:var(--muted);}
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div class="brand">CareerMAP</div>
+    <div class="nav-label">Your Results</div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div class="header-label">Here's What We Learned About You</div>
+      <h1 class="header-title" id="display-title">Loading…</h1>
+      <div class="ecosystem-tag" id="display-ecosystem">…</div>
+      <p class="intro-line">Everyone is a mix of five core traits. Here's where you land on each — in plain language — followed by a deeper read on how you work.</p>
+    </div>
+
+    <!-- THE 5 TRAITS (simple) -->
+    <div class="section-label">Your Five Traits</div>
+    <div class="section-sub">The bar shows how strongly each trait showed up in your answers. There's no "good" or "bad" score — each end just suits different kinds of work.</div>
+    <div id="traits-container"></div>
+
+    <!-- RICH ANALYSIS (all visible) -->
+    <div class="section-label">Your Deeper Read</div>
+    <div class="section-sub">Now the detail — where you shine, what trips you up, how others see you, and the environment that brings out your best.</div>
+    <div class="analysis-card">
+      <div class="chapter">
+        <div class="ch-label">💪 The Gift — your natural advantage</div>
+        <div class="ch-text" id="ch-gift"></div>
+      </div>
+      <hr class="divider">
+      <div class="chapter">
+        <div class="ch-label danger">⚠️ The Trap — what to watch out for</div>
+        <div class="ch-text trap" id="ch-trap"></div>
+      </div>
+      <hr class="divider">
+      <div class="chapter">
+        <div class="ch-label">🔍 The Misread — how others get you wrong</div>
+        <div class="ch-text" id="ch-misread"></div>
+      </div>
+      <hr class="divider">
+      <div class="chapter">
+        <div class="ch-label">🚀 The Unlock — the environment you need</div>
+        <div class="ch-text" id="ch-unlock"></div>
+      </div>
+    </div>
+
+    <!-- PREDICTIONS -->
+    <div class="section-label">Three Things We'd Bet On</div>
+    <div class="section-sub">Specific guesses drawn from your answers. Tell us how close each one is — it sharpens the matching.</div>
+    <div class="analysis-card">
+      <div class="pred-block">
+        <div class="pred-label">Your workspace right now</div>
+        <div class="pred-text" id="pred-desk"></div>
+        <div class="pred-rating">
+          <button class="pred-btn" onclick="ratePred('desk_state','accurate',this)">✓ Accurate</button>
+          <button class="pred-btn" onclick="ratePred('desk_state','partial',this)">~ Partial</button>
+          <button class="pred-btn" onclick="ratePred('desk_state','off',this)">✗ Off</button>
+        </div>
+      </div>
+      <div class="pred-block">
+        <div class="pred-label">The kind of manager that makes you want to quit</div>
+        <div class="pred-text" id="pred-manager"></div>
+        <div class="pred-rating">
+          <button class="pred-btn" onclick="ratePred('toxic_manager','accurate',this)">✓ Accurate</button>
+          <button class="pred-btn" onclick="ratePred('toxic_manager','partial',this)">~ Partial</button>
+          <button class="pred-btn" onclick="ratePred('toxic_manager','off',this)">✗ Off</button>
+        </div>
+      </div>
+      <div class="pred-block">
+        <div class="pred-label">What runs through your head when a project falls apart</div>
+        <div class="pred-text" id="pred-monologue"></div>
+        <div class="pred-rating">
+          <button class="pred-btn" onclick="ratePred('internal_monologue','accurate',this)">✓ Accurate</button>
+          <button class="pred-btn" onclick="ratePred('internal_monologue','partial',this)">~ Partial</button>
+          <button class="pred-btn" onclick="ratePred('internal_monologue','off',this)">✗ Off</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="feedback">
+      <h2>Does this sound like you?</h2>
+      <p>Slide to tell us how accurate this feels overall. Your honest rating makes the matching better.</p>
+      <div class="slider-wrap">
+        <input type="range" id="accuracy-slider" min="1" max="10" value="7">
+        <div class="slider-ends"><span>Not really me</span><span>Spot on</span></div>
+        <div class="slider-val" id="slider-display">7 / 10</div>
+      </div>
+      <button class="btn-submit" id="btn-submit" onclick="submitFeedback()">See My Career Matches →</button>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="userstore.js"></script>
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "index.html";
+
+    const reportStr = userStore.get("persona_report");
+    const scoresStr = userStore.get("dna_scores");
+    if (!reportStr || !scoresStr) {
+      alert("No results found yet — let's take the quiz first.");
+      window.location.href = "quiz.html";
+    }
+    const report = JSON.parse(reportStr);
+    const facetScores = JSON.parse(scoresStr);
+    const predictionRatings = {};
+
+    // ---- roll 15 facets into the 5 known traits ----
+    const TRAIT_FACETS = {
+      "Openness": ["Intellectual Curiosity","Creative Imagination","Aesthetic Sensitivity"],
+      "Conscientiousness": ["Orderliness","Duty and Achievement","Deliberation & Caution"],
+      "Extraversion": ["Sociability","Assertiveness","Sensation Seeking"],
+      "Agreeableness": ["Compassion","Trust & Cooperation","Modesty & Deference"],
+      "Neuroticism": ["Anxiety Proneness","Emotional Volatility","Stress Vulnerability"]
+    };
+    const TRAIT_INFO = {
+      "Openness": { icon:"🎨", plain:"curiosity & love of new ideas",
+        high:"You're <strong>curious and imaginative</strong>. You like new ideas, variety, and figuring out how things work. You get bored doing the exact same thing forever and you're drawn to the creative or unusual.",
+        mid:"You enjoy new ideas <strong>in moderation</strong> — open to fresh things, but you also like some of what's familiar and proven.",
+        low:"You're <strong>practical and grounded</strong>. You prefer proven, concrete ways of doing things over the abstract or experimental, and you value what actually works." },
+      "Conscientiousness": { icon:"🎯", plain:"organization & follow-through",
+        high:"You're <strong>organized and reliable</strong>. You plan, you finish what you start, and you hold yourself to a high standard. People can count on you to get things done.",
+        mid:"You're <strong>balanced</strong> — organized when it matters, but you also leave room to be flexible and go with the flow.",
+        low:"You're <strong>flexible and spontaneous</strong>. You prefer to keep things loose and adapt as you go rather than stick to rigid plans and routines." },
+      "Extraversion": { icon:"⚡", plain:"energy from people",
+        high:"You're <strong>outgoing and energized by people</strong>. You like being around others, thinking out loud, and jumping into conversations. Social settings recharge you.",
+        mid:"You're an <strong>ambivert</strong> — comfortable with people and comfortable alone. You enjoy company but also value your quiet time.",
+        low:"You're <strong>more reserved and inward</strong>. You do your best thinking alone or in small groups, and you recharge with quiet rather than crowds." },
+      "Agreeableness": { icon:"🤝", plain:"warmth & cooperation",
+        high:"You're <strong>warm and cooperative</strong>. You care about others, you're empathetic, and you'd rather work with people than against them. Harmony matters to you.",
+        mid:"You <strong>balance warmth with directness</strong> — kind to others, but willing to be frank and stand your ground when you need to.",
+        low:"You're <strong>direct and tough-minded</strong>. You say what you think, you're comfortable with disagreement, and you put honesty and results over keeping everyone happy." },
+      "Neuroticism": { icon:"🌊", plain:"sensitivity to stress",
+        high:"You <strong>feel things deeply</strong> and notice stress and worry more than most. That sensitivity can be a strength — you spot problems early — but calm, supportive environments help you most.",
+        mid:"You have a <strong>fairly steady emotional balance</strong> — you feel stress like anyone, but it usually doesn't run the show.",
+        low:"You're <strong>calm and steady under pressure</strong>. Stress and setbacks don't rattle you easily, and you stay even-keeled when things get tough." }
+    };
+    function levelOf(v){ if (v>=3.5) return "high"; if (v<=2.5) return "low"; return "mid"; }
+    function levelLabel(l){ return l==="high"?"Higher":l==="low"?"Lower":"Balanced"; }
+    function traitScore(trait){
+      const facets=TRAIT_FACETS[trait]; const vals=[];
+      facets.forEach(f=>{ if(facetScores[f]!=null) vals.push(Number(facetScores[f])); });
+      if(vals.length===0 && facetScores[trait]!=null) vals.push(Number(facetScores[trait]));
+      if(vals.length===0) return 3.0;
+      return vals.reduce((a,b)=>a+b,0)/vals.length;
+    }
+
+    // header
+    document.getElementById("display-title").textContent = report.archetype_title || "Your Profile";
+    document.getElementById("display-ecosystem").textContent = `Best-fit world: ${report.primary_ecosystem || "—"}`;
+
+    // 5 traits
+    const container = document.getElementById("traits-container");
+    const aiWhy = (report && report.trait_explanations) ? report.trait_explanations : {};
+    ["Openness","Conscientiousness","Extraversion","Agreeableness","Neuroticism"].forEach(trait=>{
+      const v=traitScore(trait), lvl=levelOf(v), info=TRAIT_INFO[trait], pct=(v/5)*100;
+      const scoreLabel = v.toFixed(1) + " / 5";
+      // prefer the AI's personalized "why" for this trait; fall back to the templated text
+      const why = (aiWhy[trait] && String(aiWhy[trait]).trim()) ? aiWhy[trait] : info[lvl];
+      const row=document.createElement("div"); row.className="trait";
+      row.innerHTML=`<div class="trait-top">
+          <span class="trait-icon">${info.icon}</span>
+          <span class="trait-name">${trait} <span style="font-weight:400;color:var(--muted);font-size:13px;">— ${info.plain}</span></span>
+          <span class="trait-level lvl-${lvl}">${scoreLabel}</span></div>
+        <div class="trait-bar-bg"><div class="trait-bar-fill" data-target="${pct}"></div></div>
+        <div class="trait-desc">${why}</div>`;
+      container.appendChild(row);
+    });
+    setTimeout(()=>{document.querySelectorAll(".trait-bar-fill").forEach(el=>{el.style.width=el.dataset.target+"%";});},120);
+
+    // rich chapters
+    document.getElementById("ch-gift").textContent = report.chapters?.the_gift || "—";
+    document.getElementById("ch-trap").textContent = report.chapters?.the_trap || "—";
+    document.getElementById("ch-misread").textContent = report.chapters?.the_misread || "—";
+    document.getElementById("ch-unlock").textContent = report.chapters?.the_unlock || "—";
+
+    // predictions
+    document.getElementById("pred-desk").textContent = `"${report.falsifiable_predictions?.desk_state || "—"}"`;
+    document.getElementById("pred-manager").textContent = `"${report.falsifiable_predictions?.toxic_manager || "—"}"`;
+    document.getElementById("pred-monologue").textContent = `"${report.falsifiable_predictions?.internal_monologue || "—"}"`;
+    function ratePred(key,rating,btn){
+      predictionRatings[key]=rating;
+      const g=btn.closest(".pred-rating");
+      g.querySelectorAll(".pred-btn").forEach(b=>b.classList.remove("sel-accurate","sel-partial","sel-off"));
+      btn.classList.add(`sel-${rating}`);
+    }
+
+    // slider
+    const slider=document.getElementById("accuracy-slider");
+    slider.addEventListener("input",()=>{document.getElementById("slider-display").textContent=`${slider.value} / 10`;});
+
+    async function submitFeedback(){
+      const btn=document.getElementById("btn-submit"); btn.textContent="Saving…"; btn.disabled=true;
+      const sessionId=userStore.get("active_session_id");
+      const accuracyRating=parseInt(slider.value);
+      try{
+        if(sessionId && window.Config && Config.BACKEND_URL){
+          await fetch(`${Config.BACKEND_URL}/quiz/session/${sessionId}/feedback`,{
+            method:"POST",
+            headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
+            body:JSON.stringify({accuracy_rating:accuracyRating, prediction_ratings:predictionRatings})
+          });
+        }
+      }catch{}
+      window.location.href="world.html";
+    }
+  </script>
+<div style="max-width:760px;margin:30px auto 50px;padding:0 24px;text-align:center;font-size:12px;color:#9a96a8;line-height:1.6;">This analysis is generated by AI from your answers. It is a mirror for reflection — not a clinical, medical, or psychological assessment, and it can be wrong. Take what is useful, leave what is not.</div>
+</body>
+</html>

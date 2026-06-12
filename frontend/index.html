@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CareerMAP — Find your way</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#f6f4ef; --card:#fffdf9; --ink:#1a1822; --muted:#6a6678; --faint:#9a96a8;
+    --gold:#d4a93f; --gold-deep:#b38b22; --gold-soft:rgba(212,169,63,.12);
+    --border:#e7e3da; --green:#1f9d6b; --red:#b54747;
+    --contour:rgba(26,24,34,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;}
+
+  /* faint paper grain over everything */
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.025 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  .shell{display:flex;min-height:100vh;}
+
+  /* ── Left: the territory ─────────────────────────────── */
+  .terrain{position:relative;flex:1.15;display:flex;flex-direction:column;justify-content:space-between;
+    padding:44px 56px;overflow:hidden;border-right:1px solid var(--border);}
+  .terrain svg.contours{position:absolute;inset:-10%;width:120%;height:120%;z-index:0;}
+  .contour-line{fill:none;stroke:var(--contour);stroke-width:1.4;}
+  .contour-line.gold{stroke:rgba(212,169,63,.4);stroke-width:1.6;}
+  @media (prefers-reduced-motion: no-preference){
+    .drift{animation:drift 26s ease-in-out infinite alternate;}
+    .drift2{animation:drift 34s ease-in-out infinite alternate-reverse;}
+    @keyframes drift{from{transform:translate(0,0) rotate(0deg);}to{transform:translate(-26px,18px) rotate(.6deg);}}
+    .pulse{animation:pulse 2.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box;}
+    @keyframes pulse{0%,100%{opacity:.9;transform:scale(1);}50%{opacity:.45;transform:scale(1.7);}}
+  }
+
+  .brand{position:relative;z-index:1;font-family:'Fraunces',serif;font-weight:700;font-size:20px;letter-spacing:-.01em;}
+  .brand b{color:var(--gold-deep);font-weight:700;}
+
+  .manifesto{position:relative;z-index:1;max-width:540px;}
+  .kicker{font-size:12px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:18px;}
+  .manifesto h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(34px,4.6vw,58px);line-height:1.06;letter-spacing:-.015em;margin-bottom:20px;}
+  .manifesto h1 em{font-style:italic;font-weight:500;color:var(--gold-deep);}
+  .manifesto p{font-size:16.5px;color:var(--muted);max-width:430px;}
+
+  .legend{position:relative;z-index:1;display:flex;gap:26px;flex-wrap:wrap;font-size:12.5px;color:var(--faint);}
+  .legend span{display:flex;align-items:center;gap:8px;}
+  .legend i{width:18px;height:0;border-top:1.6px solid var(--contour);display:inline-block;}
+  .legend i.g{border-top:1.6px solid var(--gold);}
+  .legend i.dot{width:7px;height:7px;border:none;border-radius:50%;background:var(--gold);}
+
+  /* ── Right: the doorway ──────────────────────────────── */
+  .doorway{flex:1;display:flex;align-items:center;justify-content:center;padding:44px 32px;}
+  .auth-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border);border-radius:20px;
+    padding:38px 34px;box-shadow:0 18px 50px rgba(26,24,34,.07);}
+  .auth-head{font-family:'Fraunces',serif;font-size:25px;font-weight:600;margin-bottom:6px;}
+  .auth-sub{font-size:14px;color:var(--muted);margin-bottom:26px;}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+  .field input{width:100%;padding:13px 15px;border:1.5px solid var(--border);border-radius:11px;background:#fff;
+    font-family:'Outfit',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .18s;}
+  .field input:focus{border-color:var(--gold);}
+
+  .btn-go{width:100%;margin-top:6px;padding:15px;border:none;border-radius:30px;background:var(--gold);color:#fff;
+    font-family:'Outfit',sans-serif;font-size:15.5px;font-weight:600;cursor:pointer;transition:.18s;}
+  .btn-go:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 26px rgba(212,169,63,.4);}
+  .btn-go:disabled{opacity:.65;cursor:wait;transform:none;}
+
+  .swap{text-align:center;margin-top:20px;font-size:14px;color:var(--muted);}
+  .swap span{color:var(--gold-deep);font-weight:600;cursor:pointer;}
+  .swap span:hover{text-decoration:underline;}
+
+  .msg{display:none;font-size:13.5px;line-height:1.55;border-radius:10px;padding:11px 14px;margin-bottom:16px;}
+  .msg.err{display:block;background:#fdf1f0;border:1px solid #f2cfcb;color:var(--red);}
+  .msg.info{display:block;background:var(--gold-soft);border:1px solid rgba(212,169,63,.35);color:#7a6420;}
+
+  .tiny{margin-top:18px;text-align:center;font-size:11.5px;color:var(--faint);line-height:1.5;}
+
+  /* ── Mobile ──────────────────────────────────────────── */
+  @media (max-width:860px){
+    .shell{flex-direction:column;}
+    .terrain{flex:none;min-height:300px;padding:28px 24px;border-right:none;border-bottom:1px solid var(--border);gap:26px;}
+    .legend{display:none;}
+    .doorway{padding:30px 18px 50px;}
+    .auth-card{box-shadow:none;border-radius:16px;padding:30px 24px;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- LEFT: unmapped terrain -->
+  <div class="terrain">
+    <svg class="contours" viewBox="0 0 900 760" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g class="drift">
+        <path class="contour-line" d="M-40,120 C140,60 300,170 470,120 C640,70 760,150 940,100"/>
+        <path class="contour-line" d="M-40,180 C150,115 310,225 480,175 C650,125 770,205 940,158"/>
+        <path class="contour-line" d="M-40,245 C160,175 320,285 490,235 C660,185 780,265 940,220"/>
+        <path class="contour-line gold" d="M-40,312 C170,238 330,348 500,298 C670,248 790,328 940,285"/>
+        <path class="contour-line" d="M-40,380 C180,305 340,415 510,365 C680,315 800,395 940,352"/>
+      </g>
+      <g class="drift2">
+        <path class="contour-line" d="M-40,480 C120,420 280,520 450,475 C620,430 760,510 940,460"/>
+        <path class="contour-line" d="M-40,545 C130,482 290,585 460,540 C630,495 770,575 940,525"/>
+        <path class="contour-line gold" d="M-40,612 C140,545 300,652 470,605 C640,558 780,640 940,592"/>
+        <path class="contour-line" d="M-40,678 C150,608 310,718 480,670 C650,622 790,705 940,658"/>
+      </g>
+      <!-- you are here -->
+      <g>
+        <circle class="pulse" cx="500" cy="298" r="9" fill="rgba(212,169,63,.35)"/>
+        <circle cx="500" cy="298" r="4.5" fill="#d4a93f"/>
+      </g>
+    </svg>
+
+    <div class="brand">Career<b>MAP</b></div>
+
+    <div class="manifesto">
+      <div class="kicker">You are here</div>
+      <h1>Every life is a territory.<br/>Most of us were never <em>given the map.</em></h1>
+      <p>Understand who you are, walk through the worlds of work, and draw your own route — one honest step at a time.</p>
+    </div>
+
+    <div class="legend">
+      <span><i></i> unexplored ground</span>
+      <span><i class="g"></i> paths that fit you</span>
+      <span><i class="dot"></i> where you stand today</span>
+    </div>
+  </div>
+
+  <!-- RIGHT: the doorway -->
+  <div class="doorway">
+    <div class="auth-card">
+      <div class="auth-head" id="auth-head">Welcome back</div>
+      <div class="auth-sub" id="auth-sub">Pick up your journey where you left it.</div>
+
+      <div class="msg" id="msg"></div>
+
+      <form id="auth-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" required autocomplete="email" placeholder="you@example.com" />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn-go" id="btn-go">Sign in</button>
+      </form>
+
+      <div class="swap" id="swap">New here? <span onclick="toggleMode()">Create your account</span></div>
+      <div class="tiny">Your reflections stay private to your account.<br/>The analysis is AI-generated guidance, not a clinical assessment.</div>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="userstore.js"></script>
+<script>
+  let isLogin = true;
+  Config.wakeServer(); // free-tier servers sleep; wake it while the user types
+
+  function setMsg(text, type){
+    const m = document.getElementById('msg');
+    if(!text){ m.className='msg'; m.textContent=''; return; }
+    m.className = 'msg ' + (type||'err');
+    m.textContent = text;
+  }
+
+  function toggleMode(){
+    isLogin = !isLogin;
+    setMsg('');
+    document.getElementById('auth-head').textContent = isLogin ? 'Welcome back' : 'Begin your map';
+    document.getElementById('auth-sub').textContent  = isLogin
+      ? 'Pick up your journey where you left it.'
+      : 'One account. Your whole journey, saved.';
+    document.getElementById('btn-go').textContent = isLogin ? 'Sign in' : 'Create account';
+    document.getElementById('password').autocomplete = isLogin ? 'current-password' : 'new-password';
+    document.getElementById('swap').innerHTML = isLogin
+      ? 'New here? <span onclick="toggleMode()">Create your account</span>'
+      : 'Already have an account? <span onclick="toggleMode()">Sign in</span>';
+  }
+
+  document.getElementById('auth-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('btn-go');
+    const endpoint = isLogin ? '/auth/login' : '/auth/register';
+
+    btn.disabled = true;
+    btn.textContent = isLogin ? 'Signing in…' : 'Creating account…';
+    setMsg('');
+
+    // Free-tier backends can take ~30s to wake from sleep — tell the user.
+    const slowNote = setTimeout(() => {
+      setMsg('Waking up the server — this can take up to 30 seconds the first time. Hang on…', 'info');
+    }, 4000);
+
+    try {
+      const res = await fetch(`${Config.BACKEND_URL}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      clearTimeout(slowNote);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+
+      // ── store session ──
+      localStorage.setItem('token', data.token);
+      if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+      const uid = data.user && (data.user.id ?? data.user.email);
+      if (uid != null) localStorage.setItem('current_user_id', String(uid));
+
+      // ── pull this user's saved journey from the server (cross-device) ──
+      setMsg('Loading your journey…', 'info');
+      await userStore.hydrate();
+
+      // ── route ──
+      const status = data.journey_status;
+      if (!isLogin) {
+        window.location.href = 'intro.html';               // brand-new → intro
+      } else if (userStore.get('intro_done')) {
+        window.location.href = 'profile.html';             // returning → home base
+      } else if (status === 'New') {
+        window.location.href = 'intro.html';               // never did intro
+      } else {
+        window.location.href = 'profile.html';
+      }
+    } catch (err) {
+      clearTimeout(slowNote);
+      const offline = (err instanceof TypeError);
+      setMsg(offline
+        ? 'Cannot reach the server right now. Please check your connection and try again in a moment.'
+        : err.message);
+      btn.disabled = false;
+      btn.textContent = isLogin ? 'Sign in' : 'Create account';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareerMAP — Your Learning Canvas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#f4f5f7;--card:#ffffff;--text:#111118;--muted:#646473;
+      --gold:#b38b22;--gold-soft:rgba(179,139,34,0.08);--gold-glow:rgba(179,139,34,0.15);
+      --border:#e2e4e9;--red:#b54747;--ink:#1a1a22;--green:#16a34a;--green-soft:rgba(22,163,74,.08);
+      --inst:#2563eb;--inst-soft:rgba(37,99,235,.08);
+      --mentor:#7c3aed;--mentor-soft:rgba(124,58,237,.08);
+      --self:#ea580c;--self-soft:rgba(234,88,12,.08);
+      --net:#0d9488;--net-soft:rgba(13,148,136,.08);
+      --amber:#d97706;--amber-soft:rgba(217,119,6,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    .nav{padding:18px 36px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:0;z-index:40;}
+    .brand{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;}
+    .nav-right{display:flex;align-items:center;gap:18px;}
+    .nav-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+    .points-badge{display:flex;align-items:center;gap:7px;background:var(--gold-soft);border:1px solid rgba(179,139,34,.35);border-radius:20px;padding:6px 14px;font-weight:700;font-size:14px;color:var(--gold);}
+    .points-badge .pts-num{font-size:15px;}
+
+    .wrap{max-width:1080px;margin:0 auto;padding:34px 28px 90px;}
+
+    /* path menu */
+    .path-bar{position:relative;margin-bottom:26px;}
+    .path-kicker{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:10px;}
+    .path-trigger{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;cursor:pointer;transition:.18s;}
+    .path-trigger:hover{border-color:var(--gold);}
+    .path-trigger .pt-body{flex:1;}
+    .pt-role{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;line-height:1.15;}
+    .pt-meta{font-size:13px;color:var(--muted);margin-top:2px;}
+    .pt-caret{font-size:14px;color:var(--muted);background:var(--bg);border-radius:8px;padding:8px 12px;font-weight:700;white-space:nowrap;}
+    .pt-caret .count{color:var(--gold);}
+    .path-menu{position:absolute;left:0;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 50px rgba(0,0,0,.14);padding:10px;z-index:50;display:none;}
+    .path-menu.open{display:block;}
+    .pm-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 12px 6px;}
+    .pm-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:.12s;}
+    .pm-item:hover{background:var(--gold-soft);}
+    .pm-item.current{background:var(--gold-soft);border:1px solid rgba(179,139,34,.3);}
+    .pm-item .pmi-role{font-weight:700;font-size:14.5px;}
+    .pm-item .pmi-meta{font-size:12px;color:var(--muted);margin-top:1px;}
+    .pm-item .pmi-tag{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--gold);white-space:nowrap;}
+    .pm-empty{padding:12px 14px;font-size:13px;color:var(--muted);font-style:italic;}
+    .pm-foot{border-top:1px solid var(--border);margin-top:6px;padding-top:6px;}
+    .pm-foot a{display:block;padding:11px 14px;font-size:13px;font-weight:700;color:var(--gold);text-decoration:none;border-radius:8px;}
+    .pm-foot a:hover{background:var(--gold-soft);}
+
+    /* selector */
+    .selector{display:flex;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;margin-bottom:30px;overflow-x:auto;}
+    .sel-btn{flex:1;min-width:140px;border:none;background:none;font-family:inherit;font-size:14px;font-weight:700;color:var(--muted);padding:13px 14px;border-radius:9px;cursor:pointer;transition:.16s;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .sel-btn:hover{color:var(--text);}
+    .sel-btn.active{background:var(--ink);color:#fff;}
+    .sel-btn .soon{font-size:9px;background:var(--gold);color:#fff;padding:2px 6px;border-radius:10px;letter-spacing:.03em;}
+
+    .panel{display:none;}
+    .panel.active{display:block;animation:fade .25s ease;}
+    @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+    .panel-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:6px;}
+    .panel-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:26px;max-width:660px;}
+
+    /* roadmap choose */
+    .road-choice{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:30px;}
+    @media (max-width:680px){.road-choice{grid-template-columns:1fr;}}
+    .choice-card{border:1px solid var(--border);border-radius:13px;padding:22px;background:var(--card);cursor:pointer;transition:.16s;}
+    .choice-card:hover{border-color:var(--gold);}
+    .choice-card.active{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold);}
+    .cc-icon{font-size:24px;margin-bottom:10px;}
+    .cc-title{font-weight:700;font-size:16px;margin-bottom:5px;}
+    .cc-desc{font-size:13px;color:var(--muted);line-height:1.5;}
+
+    .progress-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;height:11px;overflow:hidden;margin-bottom:8px;}
+    .progress-fill{height:100%;background:var(--green);width:0%;transition:width .3s;}
+    .progress-label{font-size:12.5px;color:var(--muted);margin-bottom:8px;font-weight:600;}
+
+    /* ===== GATED STEPS ===== */
+    .step-card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden;transition:.2s;}
+    .step-card.active-step{border-color:var(--gold);box-shadow:0 6px 24px var(--gold-glow);}
+    .step-card.done-step{border-color:rgba(22,163,74,.4);}
+    .step-card.locked-step{opacity:.6;}
+    .step-head{display:flex;align-items:flex-start;gap:14px;padding:18px 20px;}
+    .step-num{width:34px;height:34px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;color:var(--muted);}
+    .active-step .step-num{background:var(--gold);color:#fff;}
+    .done-step .step-num{background:var(--green);color:#fff;}
+    .step-h-body{flex:1;}
+    .step-title{font-weight:700;font-size:16.5px;line-height:1.35;}
+    .step-detail{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5;}
+    .step-status{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 10px;border-radius:20px;white-space:nowrap;height:fit-content;}
+    .ss-locked{background:var(--bg);color:var(--muted);}
+    .ss-active{background:var(--gold-soft);color:var(--gold);}
+    .ss-review{background:var(--amber-soft);color:var(--amber);}
+    .ss-done{background:var(--green-soft);color:var(--green);}
+
+    .step-body{padding:0 20px 20px;border-top:1px solid var(--border);}
+    .locked-note{padding:14px 20px;font-size:13px;color:var(--muted);font-style:italic;display:flex;align-items:center;gap:8px;}
+
+    .define-block{margin-top:18px;}
+    .define-label{font-weight:700;font-size:13.5px;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+    .define-label .dl-pts{font-size:10.5px;font-weight:700;color:var(--gold);background:var(--gold-soft);border-radius:10px;padding:2px 8px;letter-spacing:.03em;}
+    textarea,.txt-in{width:100%;border:1px solid var(--border);border-radius:9px;padding:12px 14px;font-family:inherit;font-size:14px;outline:none;resize:vertical;}
+    textarea:focus,.txt-in:focus{border-color:var(--gold);}
+    .save-btn{margin-top:10px;background:var(--ink);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;}
+    .save-btn:hover{background:var(--gold);}
+    .saved-tick{color:var(--green);font-weight:700;font-size:13px;margin-left:10px;}
+
+    .proj{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+    .proj-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+    .proj-n{font-weight:800;color:var(--gold);font-size:13px;}
+    .proj-name{flex:1;font-weight:600;font-size:14px;}
+    .proj-status{font-size:10.5px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:10px;}
+    .proj-link-row{display:flex;gap:8px;margin-top:8px;}
+    .proj-link-row input{flex:1;}
+    .proj-submit{background:var(--inst);color:#fff;border:none;border-radius:8px;padding:0 14px;font-family:inherit;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap;}
+    .proj-submit:hover{opacity:.9;}
+    .proj-submitted{background:var(--amber-soft);border:1px solid rgba(217,119,6,.3);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:12.5px;color:var(--amber);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+    .proj-submitted a{color:var(--inst);font-weight:700;word-break:break-all;}
+    .mock-approve{background:var(--green);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-family:inherit;font-weight:700;font-size:11.5px;cursor:pointer;white-space:nowrap;}
+    .proj-approved{background:var(--green-soft);border:1px solid rgba(22,163,74,.3);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:12.5px;color:var(--green);font-weight:700;}
+    .add-proj{display:flex;gap:8px;margin-top:4px;}
+    .add-proj input{flex:1;}
+    .add-proj button{background:none;border:1px solid var(--border);border-radius:8px;padding:0 14px;font-family:inherit;font-weight:700;cursor:pointer;font-size:18px;}
+    .add-proj button:hover{border-color:var(--gold);color:var(--gold);}
+    .mock-banner{font-size:11px;color:var(--amber);background:var(--amber-soft);border:1px dashed rgba(217,119,6,.4);border-radius:7px;padding:7px 11px;margin-top:6px;line-height:1.4;}
+
+    .complete-step-btn{width:100%;margin-top:14px;background:var(--green);color:#fff;border:none;border-radius:9px;padding:13px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;}
+    .complete-step-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+
+    .empty-road{font-size:14px;color:var(--muted);font-style:italic;padding:24px;text-align:center;background:var(--card);border:1px dashed var(--border);border-radius:12px;line-height:1.5;}
+    .add-step{display:flex;gap:8px;margin-top:16px;max-width:560px;}
+    .add-step input{flex:1;border:1px solid var(--border);border-radius:9px;padding:12px 14px;font-family:inherit;font-size:14px;outline:none;}
+    .add-step input:focus{border-color:var(--gold);}
+    .add-step button{background:var(--ink);color:#fff;border:none;border-radius:9px;padding:0 18px;font-weight:700;cursor:pointer;font-family:inherit;font-size:20px;}
+    .add-step button:hover{background:var(--gold);}
+
+    /* AI form */
+    .ai-q{margin-bottom:22px;}
+    .ai-q label{display:block;font-weight:700;font-size:14.5px;margin-bottom:10px;}
+    .ai-opts{display:flex;gap:8px;flex-wrap:wrap;}
+    .ai-opts button{border:1px solid var(--border);background:#fff;border-radius:9px;padding:10px 15px;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--text);cursor:pointer;transition:.15s;}
+    .ai-opts button:hover{border-color:var(--gold);}
+    .ai-opts button.sel{background:var(--ink);color:#fff;border-color:var(--ink);}
+    .btn-generate{margin-top:8px;background:var(--gold);color:#fff;border:none;border-radius:9px;padding:13px 24px;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;transition:.18s;}
+    .btn-generate:hover:not(:disabled){background:#9c7a1e;}
+    .btn-generate:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+    .btn-regen{background:none;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--text);cursor:pointer;}
+    .btn-regen:hover{border-color:var(--gold);color:var(--gold);}
+    .ai-spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* options (courses/network) */
+    .opt{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px 18px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;transition:.15s;}
+    .opt:hover{border-color:var(--gold);}
+    .opt-body{flex:1;}
+    .opt-top{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:4px;}
+    .opt-name{font-size:15px;font-weight:700;}
+    .opt-pill{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:5px;white-space:nowrap;}
+    .opt-desc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
+    .opt-meta{font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;}
+    .subhead{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin:24px 0 12px;display:flex;align-items:center;gap:9px;}
+    .sample-note{font-size:11.5px;color:var(--muted);font-style:italic;margin:6px 0 0;}
+
+    .coming{text-align:center;padding:70px 24px;background:var(--card);border:1px dashed var(--border);border-radius:16px;}
+    .coming-icon{font-size:42px;margin-bottom:16px;}
+    .coming-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:10px;}
+    .coming-desc{font-size:14.5px;color:var(--muted);line-height:1.7;max-width:520px;margin:0 auto 6px;}
+    .coming-tag{display:inline-block;margin-top:16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;background:var(--gold-soft);color:var(--gold);border:1px solid rgba(179,139,34,.3);padding:6px 14px;border-radius:20px;}
+
+    .points-info{background:var(--gold-soft);border:1px solid rgba(179,139,34,.25);border-radius:10px;padding:13px 16px;font-size:12.5px;color:var(--text);line-height:1.55;margin-bottom:22px;}
+    .points-info strong{color:var(--gold);}
+
+    .empty-banner{max-width:560px;margin:80px auto;text-align:center;color:var(--muted);}
+    .empty-banner a{color:var(--gold);font-weight:700;text-decoration:none;}
+    .hidden{display:none!important;}
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div class="brand">CareerMAP</div>
+    <div class="nav-right">
+      <div class="points-badge" id="points-badge" title="Points are a local tally for now — they'll become your real profile score with the backend.">⭐ <span class="pts-num" id="pts-num">0</span> pts</div>
+      <div class="nav-label">Learning Canvas</div>
+    </div>
+  </div>
+
+  <div id="empty" class="empty-banner hidden">
+    <p style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:10px;">No path chosen yet</p>
+    <p>You haven't picked a path to explore. <a href="world.html">← Start by choosing a world</a></p>
+  </div>
+
+  <div id="wrap" class="wrap hidden">
+    <!-- PATH MENU -->
+    <div class="path-bar">
+      <div class="path-kicker">You're Building For</div>
+      <div class="path-trigger" id="path-trigger">
+        <div class="pt-body">
+          <div class="pt-role" id="c-role">—</div>
+          <div class="pt-meta" id="c-meta"></div>
+        </div>
+        <div class="pt-caret" id="pt-caret">Switch path ▾</div>
+      </div>
+      <div class="path-menu" id="path-menu">
+        <div class="pm-label">Your aligned desires</div>
+        <div id="pm-list"></div>
+        <div class="pm-foot"><a href="world.html">+ Explore another world</a></div>
+      </div>
+    </div>
+
+    <!-- SELECTOR -->
+    <div class="selector">
+      <button class="sel-btn active" data-panel="roadmap">🗺️ Roadmap</button>
+      <button class="sel-btn" data-panel="courses">🎓 Courses &amp; Mentors</button>
+      <button class="sel-btn" data-panel="network">🤝 Network</button>
+      <button class="sel-btn" data-panel="library">📂 My Library <span class="soon">Soon</span></button>
+    </div>
+
+    <!-- PANEL: Roadmap -->
+    <div class="panel active" id="panel-roadmap">
+      <!-- BEFORE a roadmap exists: choose how to build it -->
+      <div id="road-setup">
+        <div class="panel-title">Build Your Roadmap</div>
+        <div class="panel-sub">First, lay out your path — build it yourself step by step, or let AI draft one. You earn points the moment you have a roadmap.</div>
+        <div class="road-choice">
+          <div class="choice-card active" id="choice-self" onclick="setRoadMode('self')">
+            <div class="cc-icon">✍️</div>
+            <div class="cc-title">Build it myself</div>
+            <div class="cc-desc">Add your own steps in order. <strong>+10 pts</strong> for your first step.</div>
+          </div>
+          <div class="choice-card" id="choice-ai" onclick="setRoadMode('ai')">
+            <div class="cc-icon">✨</div>
+            <div class="cc-title">Let AI generate it</div>
+            <div class="cc-desc">Answer four questions, get a drafted roadmap. <strong>+15 pts</strong>.</div>
+          </div>
+        </div>
+
+        <!-- self build -->
+        <div id="self-road">
+          <div id="self-steps-list"></div>
+          <div class="add-step">
+            <input type="text" id="step-input" placeholder="Write a step of your path…" onkeydown="if(event.key==='Enter')addCustomStep()" />
+            <button onclick="addCustomStep()">+</button>
+          </div>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:10px;">Add your steps in order, then press “Start learning” below.</p>
+          <button class="btn-generate" id="self-start" style="margin-top:6px;" disabled onclick="startJourney()">Start learning →</button>
+        </div>
+
+        <!-- AI build -->
+        <div id="ai-road" class="hidden">
+          <div id="ai-form">
+            <p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px;max-width:600px;">
+              Answer four quick questions and AI will draft a step-by-step roadmap for <strong id="ai-role-name">this path</strong>.
+            </p>
+            <div class="ai-q"><label>What's your current level with this?</label>
+              <div class="ai-opts" data-q="level">
+                <button type="button" data-val="Complete beginner — starting from scratch">Complete beginner</button>
+                <button type="button" data-val="Some basic exposure or self-study">Some basics</button>
+                <button type="button" data-val="Intermediate — I've done real work in it">Intermediate</button>
+                <button type="button" data-val="Switching careers, with transferable skills">Career switcher</button>
+              </div>
+            </div>
+            <div class="ai-q"><label>How much time can you give it?</label>
+              <div class="ai-opts" data-q="time">
+                <button type="button" data-val="A few hours a week">A few hrs/week</button>
+                <button type="button" data-val="Around 10 hours a week">~10 hrs/week</button>
+                <button type="button" data-val="Part-time, around 20 hours a week">~20 hrs/week</button>
+                <button type="button" data-val="Full-time focus">Full-time</button>
+              </div>
+            </div>
+            <div class="ai-q"><label>What's your goal?</label>
+              <div class="ai-opts" data-q="goal">
+                <button type="button" data-val="Explore it as a hobby / curiosity">Hobby / curiosity</button>
+                <button type="button" data-val="Become job-ready in about 6 months">Job-ready ~6 months</button>
+                <button type="button" data-val="Build deep, long-term mastery">Deep mastery</button>
+                <button type="button" data-val="Build a specific project or portfolio">A project / portfolio</button>
+              </div>
+            </div>
+            <div class="ai-q"><label>What's your budget for learning?</label>
+              <div class="ai-opts" data-q="budget">
+                <button type="button" data-val="Free resources only">Free only</button>
+                <button type="button" data-val="A small budget for a few key resources">Small budget</button>
+                <button type="button" data-val="Comfortable paying for good courses">Open to paid</button>
+              </div>
+            </div>
+            <button class="btn-generate" id="ai-generate" disabled onclick="generateRoadmap()">✨ Generate my roadmap</button>
+            <p style="font-size:12px;color:var(--muted);margin-top:10px;">Answer all four to generate.</p>
+          </div>
+          <div id="ai-loading" class="hidden" style="text-align:center;padding:50px 24px;">
+            <div class="ai-spinner"></div>
+            <p style="font-family:'Playfair Display',serif;font-size:17px;margin-top:16px;">Drafting your roadmap…</p>
+          </div>
+          <div id="ai-error" class="hidden" style="background:#fff5f5;border:1px solid #fbd5d5;border-radius:10px;padding:18px 20px;color:#7a2020;font-size:14px;line-height:1.5;">
+            <span id="ai-error-msg"></span>
+            <button class="btn-generate" style="margin-top:14px;" onclick="resetAiForm()">← Try again</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AFTER a roadmap exists: the gated journey -->
+      <div id="road-journey" class="hidden">
+        <div class="panel-title">Your Learning Journey</div>
+        <div class="panel-sub">One step at a time. Define each step, complete 2–3 projects, submit them for review — and the next step unlocks.</div>
+        <div class="points-info">
+          ⭐ <strong>How points work:</strong> roadmap created <strong>(done)</strong> · define a step <strong>+5</strong> · add a project <strong>+3</strong> · project approved <strong>+10</strong> · finish a step <strong>+25</strong>. <em>Points are a local tally for now — they become your real, shareable profile score when the backend is built.</em>
+        </div>
+        <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-label" id="progress-label">Step 1 of 1</div>
+        <div id="journey-steps"></div>
+        <button class="btn-regen" style="margin-top:14px;" onclick="resetRoadmap()">↺ Start over with a new roadmap</button>
+      </div>
+    </div>
+
+    <!-- PANEL: Courses -->
+    <div class="panel" id="panel-courses">
+      <div class="panel-title">Courses &amp; Mentors</div>
+      <div class="panel-sub">Programs and people who teach this path. If you're learning inside one of these, your step projects are optional — the course is your structure.</div>
+      <div class="subhead">🏛️ Institutes &amp; Courses</div>
+      <div id="list-institutes"></div>
+      <p class="sample-note">Sample entries — real institutes &amp; courses will be added here.</p>
+      <div class="subhead">🧑‍🏫 Individuals &amp; Mentors</div>
+      <div id="list-mentors"></div>
+      <p class="sample-note">Sample entries — real mentors will be added here.</p>
+    </div>
+
+    <!-- PANEL: Network -->
+    <div class="panel" id="panel-network">
+      <div class="panel-title">Network &amp; Community</div>
+      <div class="panel-sub">Connect with others on this path. Once points are real, you'll see how far each person has come — and they'll see you.</div>
+      <div id="list-network"></div>
+      <p class="sample-note">Sample entries — real communities &amp; people (with their points) will appear here once the backend is live.</p>
+    </div>
+
+    <!-- PANEL: Library -->
+    <div class="panel" id="panel-library">
+      <div class="panel-title">My Library</div>
+      <div class="panel-sub">Your personal collection — saved materials you can return to and review.</div>
+      <div class="coming">
+        <div class="coming-icon">📂</div>
+        <div class="coming-title">Your Library is coming soon</div>
+        <div class="coming-desc">Soon you'll upload and store your own materials (PDFs, notes, project write-ups), review them anytime, and later share or offer them to your network.</div>
+        <div class="coming-tag">In development</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="userstore.js"></script>
+  <script>
+    const chosen = JSON.parse(userStore.get("canvas_current_path") || "null");
+    let queue   = JSON.parse(userStore.get("canvas_queue") || "[]");
+
+    // keys per chosen path
+    const baseKey = chosen ? (chosen.industry_key+"::"+chosen.role) : "none";
+    const journeyKey = "journey_"+baseKey;       // the gated journey state
+    const ptsKey = "points_total";               // single running tally across all paths
+
+    // journey = { created:bool, steps:[ {title, detail, defined:bool, projects:[{name,link,status}], done:bool} ], current:int }
+    let journey = JSON.parse(userStore.get(journeyKey) || "null");
+    let draftSteps = [];   // used only during self-build before starting
+    let points = parseInt(userStore.get(ptsKey) || "0", 10);
+    let roleDetail = {description:"",reality:""};
+
+    function savePoints(){ userStore.set(ptsKey, String(points)); document.getElementById("pts-num").textContent = points; }
+    function addPoints(n){ points += n; savePoints(); }
+    function saveJourney(){ userStore.set(journeyKey, JSON.stringify(journey)); }
+
+    function init(){
+      if(!chosen){document.getElementById("empty").classList.remove("hidden");return;}
+      document.getElementById("wrap").classList.remove("hidden");
+      document.getElementById("c-role").textContent=chosen.role;
+      document.getElementById("c-meta").textContent=`${chosen.family} · ${chosen.industry}`;
+      document.getElementById("ai-role-name").textContent=chosen.role;
+      document.getElementById("pts-num").textContent = points;
+
+      setupSelector();
+      setupPathMenu();
+      renderOptions();
+      loadRoleDetail();
+
+      if(journey && journey.created){ showJourney(); }
+      else { showSetup(); }
+    }
+
+    async function loadRoleDetail(){
+      try{
+        const res=await fetch("industries.json"); if(!res.ok) return;
+        const data=await res.json();
+        const ind=(data.industries||[]).find(i=>i.key===chosen.industry_key); if(!ind) return;
+
+        // whole-family pick: build a foundations-then-specialize brief from the family
+        if(chosen.whole_family){
+          const fam=(ind.families||[]).find(f=>f.name===chosen.family);
+          if(fam){
+            const roleNames=(fam.roles||[]).filter(r=>r.enabled!==false).map(r=>r.name);
+            roleDetail.description=`The whole "${fam.name}" area of ${ind.name}. ${fam.blurb||""} It spans roles like: ${roleNames.join(", ")}. The learner wants to build the shared foundations of this area first, then choose a specialization.`;
+            roleDetail.reality=`This is a broad area, not a single job. The goal is to learn what every role here shares before going deep on one. Expect to sample a few directions before specializing.`;
+          }
+          return;
+        }
+
+        for(const fam of (ind.families||[])){
+          const r=(fam.roles||[]).find(r=>r.name===chosen.role);
+          if(r){ roleDetail.description=r.description||""; roleDetail.reality=r.reality||""; break; }
+        }
+      }catch(e){}
+    }
+
+    function setupSelector(){
+      document.querySelectorAll(".sel-btn").forEach(btn=>{
+        btn.onclick=()=>{
+          document.querySelectorAll(".sel-btn").forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+          document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+          document.getElementById("panel-"+btn.dataset.panel).classList.add("active");
+          window.scrollTo({top:0,behavior:"smooth"});
+        };
+      });
+    }
+
+    function setupPathMenu(){
+      const trigger=document.getElementById("path-trigger");
+      const menu=document.getElementById("path-menu");
+      const caret=document.getElementById("pt-caret");
+      caret.innerHTML = queue.length>0 ? `<span class="count">${queue.length}</span> more ▾` : "Switch path ▾";
+      trigger.onclick=()=>menu.classList.toggle("open");
+      document.addEventListener("click",(e)=>{ if(!e.target.closest(".path-bar")) menu.classList.remove("open"); });
+      const list=document.getElementById("pm-list");
+      list.innerHTML="";
+      const cur=document.createElement("div");
+      cur.className="pm-item current";
+      cur.innerHTML=`<div><div class="pmi-role">${chosen.role}</div><div class="pmi-meta">${chosen.industry}</div></div><span class="pmi-tag">Current</span>`;
+      list.appendChild(cur);
+      if(queue.length===0){
+        const e=document.createElement("div");e.className="pm-empty";e.textContent="No other paths yet — explore another world to add more.";
+        list.appendChild(e);
+      } else {
+        queue.forEach((q,idx)=>{
+          const it=document.createElement("div");it.className="pm-item";
+          it.innerHTML=`<div><div class="pmi-role">${q.role}</div><div class="pmi-meta">${q.industry}</div></div><span class="pmi-tag">Switch →</span>`;
+          it.onclick=()=>switchTo(idx);
+          list.appendChild(it);
+        });
+      }
+    }
+    function switchTo(idx){
+      const newCurrent=queue[idx];
+      const newQueue=queue.filter((_,i)=>i!==idx);
+      newQueue.push(chosen);
+      userStore.set("canvas_current_path",JSON.stringify(newCurrent));
+      userStore.set("canvas_queue",JSON.stringify(newQueue));
+      window.location.reload();
+    }
+
+    /* ===== SETUP: choose self or AI ===== */
+    function showSetup(){
+      document.getElementById("road-setup").classList.remove("hidden");
+      document.getElementById("road-journey").classList.add("hidden");
+      renderDraftSteps();
+    }
+    function setRoadMode(mode){
+      document.getElementById("choice-self").classList.toggle("active",mode==="self");
+      document.getElementById("choice-ai").classList.toggle("active",mode==="ai");
+      document.getElementById("self-road").classList.toggle("hidden",mode!=="self");
+      document.getElementById("ai-road").classList.toggle("hidden",mode!=="ai");
+      if(mode==="ai") setupAiOptions();
+    }
+
+    // self-build draft list
+    function renderDraftSteps(){
+      const el=document.getElementById("self-steps-list"); el.innerHTML="";
+      draftSteps.forEach((s,i)=>{
+        const d=document.createElement("div");
+        d.className="step-card";
+        d.innerHTML=`<div class="step-head"><div class="step-num">${i+1}</div>
+          <div class="step-h-body"><div class="step-title">${s}</div></div>
+          <button class="btn-regen" style="padding:5px 10px;">✕</button></div>`;
+        d.querySelector("button").onclick=()=>{draftSteps.splice(i,1);renderDraftSteps();};
+        el.appendChild(d);
+      });
+      document.getElementById("self-start").disabled = draftSteps.length===0;
+    }
+    function addCustomStep(){
+      const inp=document.getElementById("step-input"); const v=inp.value.trim(); if(!v)return;
+      draftSteps.push(v); inp.value=""; renderDraftSteps();
+    }
+    function startJourney(){
+      if(draftSteps.length===0) return;
+      buildJourney(draftSteps.map(t=>({title:t,detail:""})));
+      addPoints(10); // self roadmap
+      showJourney();
+    }
+
+    /* ===== AI build ===== */
+    const aiAnswers={level:"",time:"",goal:"",budget:""};
+    let aiWired=false;
+    function setupAiOptions(){
+      if(aiWired)return; aiWired=true;
+      document.querySelectorAll(".ai-opts").forEach(group=>{
+        const q=group.dataset.q;
+        group.querySelectorAll("button").forEach(btn=>{
+          btn.onclick=()=>{
+            group.querySelectorAll("button").forEach(b=>b.classList.remove("sel"));
+            btn.classList.add("sel"); aiAnswers[q]=btn.dataset.val;
+            document.getElementById("ai-generate").disabled=!(aiAnswers.level&&aiAnswers.time&&aiAnswers.goal&&aiAnswers.budget);
+          };
+        });
+      });
+    }
+    async function generateRoadmap(){
+      const token=localStorage.getItem("token");
+      document.getElementById("ai-form").classList.add("hidden");
+      document.getElementById("ai-error").classList.add("hidden");
+      document.getElementById("ai-loading").classList.remove("hidden");
+      try{
+        const res=await fetch(`${Config.BACKEND_URL}/quiz/generate-roadmap`,{
+          method:"POST",
+          headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
+          body:JSON.stringify({
+            role_name:chosen.role, role_description:roleDetail.description, role_reality:roleDetail.reality,
+            current_level:aiAnswers.level, time_available:aiAnswers.time, goal:aiAnswers.goal, budget:aiAnswers.budget
+          })
+        });
+        if(!res.ok) throw new Error("Server returned "+res.status);
+        const data=await res.json();
+        const aiSteps=data.steps||[]; if(aiSteps.length===0) throw new Error("No steps came back.");
+        buildJourney(aiSteps.map(s=>({title:s.estimate?`${s.step} (${s.estimate})`:s.step, detail:s.detail||""})));
+        addPoints(15); // AI roadmap
+        document.getElementById("ai-loading").classList.add("hidden");
+        showJourney();
+      }catch(err){
+        document.getElementById("ai-loading").classList.add("hidden");
+        document.getElementById("ai-error").classList.remove("hidden");
+        document.getElementById("ai-error-msg").textContent="Couldn't generate a roadmap right now. "+(err.message||"")+" Make sure the backend is running, then try again.";
+      }
+    }
+    function resetAiForm(){
+      document.getElementById("ai-error").classList.add("hidden");
+      document.getElementById("ai-loading").classList.add("hidden");
+      document.getElementById("ai-form").classList.remove("hidden");
+    }
+
+    /* ===== build + show the gated journey ===== */
+    function buildJourney(stepObjs){
+      journey={
+        created:true, current:0,
+        steps: stepObjs.map(s=>({title:s.title, detail:s.detail, userDefine:"", defined:false, projects:[], done:false}))
+      };
+      saveJourney();
+    }
+    function resetRoadmap(){
+      if(!confirm("Start over? This clears this path's journey (your points stay).")) return;
+      journey=null; draftSteps=[]; userStore.remove(journeyKey);
+      showSetup();
+    }
+
+    function showJourney(){
+      document.getElementById("road-setup").classList.add("hidden");
+      document.getElementById("road-journey").classList.remove("hidden");
+      renderJourney();
+    }
+
+    function renderJourney(){
+      const wrap=document.getElementById("journey-steps"); wrap.innerHTML="";
+      const total=journey.steps.length;
+      const doneCount=journey.steps.filter(s=>s.done).length;
+      document.getElementById("progress-fill").style.width=Math.round(doneCount/total*100)+"%";
+      document.getElementById("progress-label").textContent=`Step ${Math.min(journey.current+1,total)} of ${total} · ${doneCount} completed`;
+
+      journey.steps.forEach((step,i)=>{
+        const isActive = i===journey.current && !step.done;
+        const isDone = step.done;
+        const isLocked = i>journey.current;
+        const card=document.createElement("div");
+        card.className="step-card "+(isDone?"done-step":isActive?"active-step":isLocked?"locked-step":"");
+
+        let statusHtml = isDone?'<span class="step-status ss-done">✓ Completed</span>'
+                       : isActive?'<span class="step-status ss-active">In progress</span>'
+                       : '<span class="step-status ss-locked">🔒 Locked</span>';
+
+        card.innerHTML=`<div class="step-head">
+            <div class="step-num">${isDone?"✓":i+1}</div>
+            <div class="step-h-body"><div class="step-title">${step.title}</div>
+              ${step.detail?`<div class="step-detail">${step.detail}</div>`:""}</div>
+            ${statusHtml}
+          </div>`;
+
+        if(isLocked){
+          const note=document.createElement("div");
+          note.className="locked-note";
+          note.innerHTML="🔒 Complete the step above to unlock this one.";
+          card.appendChild(note);
+        } else if(isActive){
+          card.appendChild(buildActiveBody(step,i));
+        } else if(isDone){
+          const body=document.createElement("div");
+          body.className="step-body";
+          body.innerHTML=`<div style="padding-top:14px;font-size:13px;color:var(--green);font-weight:600;">✓ Step finished — ${step.projects.filter(p=>p.status==='approved').length} project(s) approved.</div>`;
+          card.appendChild(body);
+        }
+        wrap.appendChild(card);
+      });
+    }
+
+    function buildActiveBody(step,idx){
+      const body=document.createElement("div");
+      body.className="step-body";
+
+      // 1. define the step
+      const defWrap=document.createElement("div");
+      defWrap.className="define-block";
+      defWrap.innerHTML=`<div class="define-label">① Define this step <span class="dl-pts">+5 pts</span></div>
+        <textarea rows="3" placeholder="In your own words: what is this step, and exactly what must you learn / finish to call it done?">${step.userDefine||""}</textarea>
+        <div><button class="save-btn">Save definition</button><span class="saved-tick ${step.defined?"":"hidden"}">✓ Saved</span></div>`;
+      const ta=defWrap.querySelector("textarea");
+      defWrap.querySelector(".save-btn").onclick=()=>{
+        const v=ta.value.trim(); if(!v){alert("Write what this step means first.");return;}
+        step.userDefine=v;
+        if(!step.defined){ step.defined=true; addPoints(5); }
+        saveJourney(); renderJourney();
+      };
+      body.appendChild(defWrap);
+
+      // 2. projects (need defined first)
+      const projWrap=document.createElement("div");
+      projWrap.className="define-block";
+      if(!step.defined){
+        projWrap.innerHTML=`<div class="define-label">② Define 2–3 projects</div>
+          <p style="font-size:13px;color:var(--muted);font-style:italic;">Save your step definition first to add projects.</p>`;
+      } else {
+        projWrap.innerHTML=`<div class="define-label">② Your projects to prove it <span class="dl-pts">+3 each · +10 approved</span></div>`;
+        step.projects.forEach((p,pi)=>{ projWrap.appendChild(renderProject(step,p,pi)); });
+        if(step.projects.length<3){
+          const add=document.createElement("div");
+          add.className="add-proj";
+          add.innerHTML=`<input class="txt-in" type="text" placeholder="Project name (e.g. 'Build a todo app')" />
+            <button>+</button>`;
+          const inp=add.querySelector("input");
+          add.querySelector("button").onclick=()=>{
+            const v=inp.value.trim(); if(!v)return;
+            step.projects.push({name:v,link:"",status:"todo"});
+            addPoints(3); saveJourney(); renderJourney();
+          };
+          projWrap.appendChild(add);
+        }
+        if(step.projects.length<2){
+          const warn=document.createElement("p");
+          warn.style.cssText="font-size:12.5px;color:var(--muted);font-style:italic;margin-top:6px;";
+          warn.textContent="Add at least 2 projects to finish this step.";
+          projWrap.appendChild(warn);
+        }
+      }
+      body.appendChild(projWrap);
+
+      // 3. complete step button
+      const approvedCount=step.projects.filter(p=>p.status==="approved").length;
+      const canFinish = step.defined && step.projects.length>=2 && approvedCount>=2;
+      const finishBtn=document.createElement("button");
+      finishBtn.className="complete-step-btn";
+      finishBtn.disabled=!canFinish;
+      finishBtn.textContent=canFinish?"✓ Finish this step → unlock the next (+25 pts)":"Finish step (define it + get 2 projects approved first)";
+      finishBtn.onclick=()=>{
+        step.done=true; addPoints(25);
+        if(journey.current < journey.steps.length-1) journey.current++;
+        saveJourney(); renderJourney();
+        window.scrollTo({top:0,behavior:"smooth"});
+      };
+      body.appendChild(finishBtn);
+
+      return body;
+    }
+
+    function renderProject(step,p,pi){
+      const el=document.createElement("div");
+      el.className="proj";
+      const statusPill = p.status==="approved"?'<span class="proj-status ss-done">Approved</span>'
+                       : p.status==="review"?'<span class="proj-status ss-review">Awaiting review</span>'
+                       : '<span class="proj-status ss-locked">To do</span>';
+      el.innerHTML=`<div class="proj-top"><span class="proj-n">P${pi+1}</span><span class="proj-name">${p.name}</span>${statusPill}</div>`;
+
+      if(p.status==="todo"){
+        const row=document.createElement("div");
+        row.className="proj-link-row";
+        row.innerHTML=`<input class="txt-in" type="text" placeholder="Paste GitHub / project link…" value="${p.link||""}" />
+          <button class="proj-submit">Submit for review</button>`;
+        const inp=row.querySelector("input");
+        row.querySelector("button").onclick=()=>{
+          const v=inp.value.trim(); if(!v){alert("Paste your project link first.");return;}
+          p.link=v; p.status="review"; saveJourney(); renderJourney();
+        };
+        el.appendChild(row);
+      } else if(p.status==="review"){
+        const sub=document.createElement("div");
+        sub.className="proj-submitted";
+        sub.innerHTML=`<span>⏳ Submitted: <a href="${p.link}" target="_blank" rel="noopener">${p.link}</a></span>
+          <button class="mock-approve">✓ Approve (mock)</button>`;
+        sub.querySelector(".mock-approve").onclick=()=>{
+          p.status="approved"; addPoints(10); saveJourney(); renderJourney();
+        };
+        el.appendChild(sub);
+        const banner=document.createElement("div");
+        banner.className="mock-banner";
+        banner.innerHTML="🔧 Real version: a reviewer/mentor checks this link and approves it. For now, the “Approve (mock)” button stands in so you can test the unlock.";
+        el.appendChild(banner);
+      } else {
+        const ok=document.createElement("div");
+        ok.className="proj-approved";
+        ok.innerHTML=`✓ Approved — <a href="${p.link}" target="_blank" rel="noopener" style="color:var(--green);">${p.link}</a>`;
+        el.appendChild(ok);
+      }
+      return el;
+    }
+
+    /* ===== options (courses/network) ===== */
+    function sampleOptions(roleName){
+      return {
+        institutes:[
+          {name:"Coursera — "+roleName+" Specialization",desc:"Structured online course series with certificates.",pill:"Online",pillColor:"inst",meta:["💵 Paid","🕐 3–6 months"]},
+          {name:"Local University — Diploma",desc:"Formal in-person diploma covering fundamentals.",pill:"In-person",pillColor:"inst",meta:["💵 Paid","🕐 1–2 years"]},
+          {name:"Bootcamp — Intensive Track",desc:"Fast, job-focused training.",pill:"Hybrid",pillColor:"inst",meta:["💵 Paid","🕐 8–16 weeks"]},
+        ],
+        mentors:[
+          {name:"1-on-1 Mentor (Marketplace)",desc:"Book sessions with an experienced "+roleName+".",pill:"Personal",pillColor:"mentor",meta:["💵 Per session"]},
+          {name:"Peer Coaching Circle",desc:"Small-group coaching led by a practitioner.",pill:"Group",pillColor:"mentor",meta:["💵 Low cost"]},
+        ],
+        network:[
+          {name:"Online Community / Discord",desc:"Active community of learners and pros.",pill:"Community",pillColor:"net",meta:["💵 Free","🌐 Online"]},
+          {name:"Local Meetup Group",desc:"In-person events to meet others.",pill:"Events",pillColor:"net",meta:["💵 Free","📍 Local"]},
+        ],
+      };
+    }
+    const pillColors={inst:["var(--inst-soft)","var(--inst)"],mentor:["var(--mentor-soft)","var(--mentor)"],net:["var(--net-soft)","var(--net)"]};
+    function renderOptions(){
+      const o=sampleOptions(chosen.role);
+      fillList("list-institutes",o.institutes); fillList("list-mentors",o.mentors); fillList("list-network",o.network);
+    }
+    function fillList(elId,items){
+      const el=document.getElementById(elId); el.innerHTML="";
+      items.forEach(it=>{
+        const [bg,fg]=pillColors[it.pillColor]||pillColors.inst;
+        const div=document.createElement("div"); div.className="opt";
+        div.innerHTML=`<div class="opt-body">
+            <div class="opt-top"><span class="opt-name">${it.name}</span><span class="opt-pill" style="background:${bg};color:${fg};">${it.pill}</span></div>
+            <div class="opt-desc">${it.desc}</div>
+            <div class="opt-meta">${it.meta.map(m=>`<span>${m}</span>`).join("")}</div>
+          </div>`;
+        el.appendChild(div);
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

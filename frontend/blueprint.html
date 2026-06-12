@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareerMAP — The Blueprint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg: #0d0d10; --text: #f5f4f0; --muted: #7a7a8e; --gold: #c9a84c; --border: #2a2a38; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Nav */
+    .nav {
+      padding: 22px 40px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .brand { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 900; }
+    .nav-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+
+    /* Main layout */
+    .container { max-width: 760px; margin: 0 auto; padding: 72px 24px 80px; width: 100%; flex: 1; display: flex; flex-direction: column; }
+
+    /* Phase indicator */
+    .phase-row { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; }
+    .phase-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.3s; }
+    .phase-dot.active { background: var(--gold); }
+    .phase-dot.done { background: var(--muted); }
+    .phase-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); }
+
+    /* Question */
+    .q-title { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; line-height: 1.38; margin-bottom: 28px; }
+
+    /* Sub-prompts */
+    .sub-list { border-left: 2px solid rgba(201,168,76,0.35); padding-left: 18px; margin-bottom: 36px; }
+    .sub-item { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+    .sub-item:last-child { margin-bottom: 0; }
+
+    /* Textarea */
+    .answer-wrap { position: relative; margin-bottom: 14px; }
+    .answer-box {
+      width: 100%; height: 210px; background: #16161e; border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); padding: 20px; font-family: 'DM Sans', sans-serif;
+      font-size: 16px; line-height: 1.72; resize: none; transition: border-color 0.25s;
+    }
+    .answer-box:focus { outline: none; border-color: var(--gold); }
+    .answer-box::placeholder { color: #3a3a4e; }
+
+    /* Word count */
+    .wc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    .wc-text { font-size: 13px; color: var(--muted); transition: color 0.2s; }
+    .wc-text.met { color: var(--gold); }
+    .wc-hint { font-size: 12px; color: #4a4a5e; }
+
+    /* Button */
+    .btn-next {
+      padding: 16px 44px; background: var(--text); color: var(--bg); border: none;
+      border-radius: 9px; font-size: 16px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: 0.2s; align-self: flex-start;
+    }
+    .btn-next:hover:not(:disabled) { background: var(--gold); color: #fff; }
+    .btn-next:disabled { background: #2a2a38; color: #4a4a5e; cursor: not-allowed; }
+
+    /* Generating screen */
+    #gen-screen {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center; padding: 60px 24px;
+    }
+    .gen-spinner {
+      width: 48px; height: 48px; border: 3px solid var(--border);
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin-bottom: 32px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .gen-title { font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 12px; }
+    .gen-sub { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 420px; }
+
+    .hidden { display: none !important; }
+    .fade-enter { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <div class="nav">
+    <div class="brand">CareerMAP</div>
+    <div class="nav-label">Foundation Blueprint</div>
+  </div>
+
+  <!-- Question UI -->
+  <div class="container" id="q-container">
+    <div class="phase-row" id="phase-dots"></div>
+    <h1 class="q-title" id="q-title">Loading...</h1>
+    <ul class="sub-list" id="q-subs"></ul>
+    <div class="answer-wrap">
+      <textarea class="answer-box" id="q-answer" placeholder="Be specific. Name the actual thing, not the feeling around it."></textarea>
+    </div>
+    <div class="wc-row">
+      <span class="wc-text" id="wc-text">0 / 30 words minimum</span>
+      <span class="wc-hint">The AI weights longer, specific answers more heavily</span>
+    </div>
+    <button class="btn-next" id="btn-next" disabled onclick="advance()">Continue →</button>
+  </div>
+
+  <!-- Generating Screen -->
+  <div id="gen-screen" class="hidden">
+    <div class="gen-spinner"></div>
+    <h2 class="gen-title">Building Your Analysis</h2>
+    <p class="gen-sub">The AI is reading your 75 responses, your qualitative signals, and your four foundation answers together. This takes 15–25 seconds. Do not close this tab.</p>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="userstore.js"></script>
+  <script>
+    const BACKEND_URL = Config.BACKEND_URL;
+
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "index.html";
+
+    const QUESTIONS = [
+      {
+        key: "desire",
+        title: "If no one you knew would ever find out what you chose to do with your life, what would you actually do?",
+        subs: [
+          "Why does removing other people's awareness make the answer feel more honest?",
+          "Who specifically in your life would you feel most relieved didn't know?",
+          "Do you want the actual process of doing this — or just the outcome, the identity, or the story?"
+        ]
+      },
+      {
+        key: "evidence",
+        title: "What is something you have done — even once, even small — where time disappeared completely?",
+        subs: [
+          "What exactly were you doing in that moment? Name the specific physical or mental action.",
+          "Did anyone ask you to do it, or did you start it on your own?",
+          "Have you done it again since? If not, what is the real reason you give yourself?"
+        ]
+      },
+      {
+        key: "resistance",
+        title: "What is one path that makes complete logical sense for your skills — but you feel a quiet resistance toward?",
+        subs: [
+          "When you picture yourself doing that work five years from now, what is the first emotion that comes up?",
+          "Is the resistance about the work itself, or about the type of person you would become?",
+          "Who in your life would be most satisfied if you chose that path?"
+        ]
+      },
+      {
+        key: "cost",
+        title: "What are you not willing to give up — and does the path you want require you to give it up?",
+        subs: [
+          "Name three specific things in your current life you would protect at all costs. Be concrete.",
+          "Does the path you actually want quietly demand you sacrifice any of these?",
+          "If it does require sacrifice — are you genuinely willing, or are you hoping to avoid the decision entirely?"
+        ]
+      }
+    ];
+
+    const MIN_WORDS = 30;
+    let idx = 0;
+    let answers = {};
+
+    // Build phase dots
+    function buildDots() {
+      const row = document.getElementById("phase-dots");
+      row.innerHTML = "";
+      QUESTIONS.forEach((_, i) => {
+        const dot = document.createElement("div");
+        dot.className = `phase-dot${i === idx ? " active" : i < idx ? " done" : ""}`;
+        row.appendChild(dot);
+      });
+      const lbl = document.createElement("span");
+      lbl.className = "phase-label";
+      lbl.textContent = `Question ${idx + 1} of ${QUESTIONS.length}`;
+      row.appendChild(lbl);
+    }
+
+    function render() {
+      const q = QUESTIONS[idx];
+      document.getElementById("q-container").classList.add("fade-enter");
+      setTimeout(() => document.getElementById("q-container").classList.remove("fade-enter"), 300);
+
+      buildDots();
+      document.getElementById("q-title").textContent = q.title;
+
+      const subList = document.getElementById("q-subs");
+      subList.innerHTML = "";
+      q.subs.forEach(s => {
+        const li = document.createElement("li");
+        li.className = "sub-item";
+        li.textContent = s;
+        subList.appendChild(li);
+      });
+
+      const box = document.getElementById("q-answer");
+      box.value = answers[q.key] || "";
+      box.focus();
+
+      document.getElementById("btn-next").textContent =
+        idx === QUESTIONS.length - 1 ? "Generate My Analysis →" : "Continue →";
+
+      updateWC();
+    }
+
+    function updateWC() {
+      const text = document.getElementById("q-answer").value.trim();
+      const count = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+      const el = document.getElementById("wc-text");
+      el.textContent = count < MIN_WORDS ? `${count} / ${MIN_WORDS} words minimum` : `${count} words ✓`;
+      el.className = count >= MIN_WORDS ? "wc-text met" : "wc-text";
+      document.getElementById("btn-next").disabled = count < MIN_WORDS;
+    }
+
+    document.getElementById("q-answer").addEventListener("input", updateWC);
+
+    function advance() {
+      const text = document.getElementById("q-answer").value.trim();
+      const count = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+      if (count < MIN_WORDS) return;
+
+      answers[QUESTIONS[idx].key] = text;
+
+      if (idx < QUESTIONS.length - 1) {
+        idx++;
+        render();
+      } else {
+        runSubmit();
+      }
+    }
+
+    async function runSubmit() {
+      // Switch to generating screen
+      document.getElementById("q-container").classList.add("hidden");
+      document.getElementById("gen-screen").classList.remove("hidden");
+
+      try {
+        // Step 1: save blueprint answers (this is what gives the AI its deepest context)
+        const saveRes = await fetch(`${BACKEND_URL}/quiz/blueprint`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+          body: JSON.stringify(answers)
+        });
+        if (!saveRes.ok) throw new Error("Blueprint save failed");
+
+        // Step 2: generate the persona report (now has blueprint context — force fresh generation)
+        const sessionId = userStore.get("active_session_id");
+        if (!sessionId) throw new Error("No active session found. Please retake the quiz.");
+
+        const reportRes = await fetch(`${BACKEND_URL}/quiz/session/${sessionId}/persona-report?force=true`, {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!reportRes.ok) throw new Error("Report generation failed");
+
+        const reportData = await reportRes.json();
+
+        // Step 3: cache in localStorage and proceed to analysis
+        userStore.set("persona_report", JSON.stringify(reportData.report));
+        userStore.set("dna_scores", JSON.stringify(reportData.facet_scores));
+
+        window.location.href = "analysis.html";
+
+      } catch (err) {
+        document.getElementById("gen-screen").innerHTML = `
+          <p style="color:#b54747; font-size:16px; max-width:480px; text-align:center; line-height:1.7;">
+            Something went wrong: ${err.message}<br><br>
+            <button onclick="window.location.reload()" style="padding:12px 28px;background:#f5f4f0;color:#0d0d10;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;margin-top:8px;">
+              Try Again
+            </button>
+          </p>
+        `;
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

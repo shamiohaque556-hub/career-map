@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareerMAP — What to Explore First</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:#f4f5f7; --card:#ffffff; --text:#111118; --muted:#646473;
+      --gold:#b38b22; --gold-soft:rgba(179,139,34,0.08); --gold-glow:rgba(179,139,34,0.15);
+      --border:#e2e4e9; --red:#b54747; --red-bg:#fff5f5; --ink:#1a1a22;
+      --cross:#2563eb; --cross-soft:rgba(37,99,235,.09);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:120px;}
+    .nav{padding:22px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:0;z-index:30;}
+    .brand{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;}
+    .nav-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+    .container{max-width:820px;margin:0 auto;padding:52px 24px 0;}
+    .hidden{display:none!important;}
+
+    .step-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:12px;text-align:center;}
+    .page-title{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;text-align:center;line-height:1.12;margin-bottom:14px;}
+    .page-sub{font-size:15px;color:var(--muted);text-align:center;max-width:620px;margin:0 auto 44px;line-height:1.65;}
+
+    .industry-group{margin-bottom:34px;}
+    .ig-head{display:flex;align-items:center;gap:9px;margin-bottom:14px;}
+    .ig-icon{font-size:20px;}
+    .ig-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;}
+    .ig-line{flex:1;height:1px;background:var(--border);margin-left:6px;}
+
+    .path{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:11px;cursor:pointer;display:flex;align-items:center;gap:16px;transition:.16s;}
+    .path:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.06);}
+    .path.chosen{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold);background:var(--gold-soft);}
+    .radio{width:24px;height:24px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.16s;}
+    .path.chosen .radio{border-color:var(--gold);}
+    .path.chosen .radio::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--gold);}
+    .path-body{flex:1;}
+    .path-role{font-size:16px;font-weight:700;margin-bottom:3px;}
+    .path-fam{font-size:12.5px;color:var(--muted);}
+    .path-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);background:var(--gold-soft);border:1px solid rgba(179,139,34,.3);border-radius:20px;padding:4px 11px;opacity:0;transition:.16s;white-space:nowrap;}
+    .path.chosen .path-badge{opacity:1;}
+
+    .empty{text-align:center;padding:80px 24px;color:var(--muted);}
+    .empty a{color:var(--gold);font-weight:700;text-decoration:none;}
+
+    /* queue preview */
+    .queue-note{margin-top:30px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 22px;font-size:13.5px;color:var(--muted);line-height:1.6;}
+    .queue-note strong{color:var(--text);}
+
+    .action-bar{position:fixed;bottom:0;left:0;width:100%;background:#fff;border-top:1px solid var(--border);padding:18px 40px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -8px 30px rgba(0,0,0,.05);z-index:30;}
+    .action-info{font-weight:700;font-size:15px;}
+    .action-hint{font-size:12.5px;color:var(--muted);margin-top:2px;}
+    .bar-btns{display:flex;gap:10px;}
+    .btn{padding:13px 26px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;border:none;transition:.2s;}
+    .btn-ghost{background:none;border:1px solid var(--border);color:var(--text);}
+    .btn-ghost:hover{border-color:var(--text);}
+    .btn-primary{background:var(--ink);color:#fff;}
+    .btn-primary:hover:not(:disabled){background:var(--gold);}
+    .btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div class="brand">CareerMAP</div>
+    <div class="nav-label">Choose Your First Path</div>
+  </div>
+
+  <div id="content" class="container">
+    <div class="step-label">Everything That Called to You</div>
+    <h1 class="page-title">What Do You Want to Explore First?</h1>
+    <p class="page-sub">
+      Here is every path you marked across the worlds you explored. You'll take them into the canvas
+      one at a time &mdash; so choose the one that pulls at you most right now. The rest will wait their turn.
+    </p>
+    <div id="groups"></div>
+    <div class="queue-note" id="queue-note"></div>
+  </div>
+
+  <div id="empty" class="empty hidden">
+    <p style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:10px;">No paths chosen yet</p>
+    <p>You haven't selected any paths to explore. <a href="world.html">← Go back and choose some worlds</a></p>
+  </div>
+
+  <div class="action-bar hidden" id="action-bar">
+    <div>
+      <div class="action-info" id="action-info">Choose one path to begin</div>
+      <div class="action-hint" id="action-hint">The rest stay saved for later.</div>
+    </div>
+    <div class="bar-btns">
+      <button class="btn btn-ghost" onclick="window.location.href='world-explore.html'">← Back</button>
+      <button class="btn btn-primary" id="go-btn" disabled onclick="openInCanvas()">Open in Canvas →</button>
+    </div>
+  </div>
+
+  <script src="userstore.js"></script>
+  <script>
+    // selections saved by world-explore.html: [{industry, industry_key, family, role}]
+    let selections = JSON.parse(userStore.get("explore_selections") || "[]");
+    let chosenIndex = -1;
+
+    // optional: industry icons from industries.json (best-effort, for nicer headers)
+    let iconByKey = {};
+
+    async function init() {
+      if (selections.length === 0) {
+        document.getElementById("content").classList.add("hidden");
+        document.getElementById("empty").classList.remove("hidden");
+        return;
+      }
+      try {
+        const res = await fetch("industries.json");
+        if (res.ok) {
+          const data = await res.json();
+          (data.industries || []).forEach(i => { iconByKey[i.key] = i.icon || ""; });
+        }
+      } catch { /* icons are optional */ }
+
+      render();
+      document.getElementById("action-bar").classList.remove("hidden");
+    }
+
+    function render() {
+      // group selections by industry
+      const groups = {};
+      selections.forEach((sel, idx) => {
+        const key = sel.industry_key || sel.industry;
+        if (!groups[key]) groups[key] = { name: sel.industry, items: [] };
+        groups[key].items.push({ ...sel, idx });
+      });
+
+      const container = document.getElementById("groups");
+      container.innerHTML = "";
+      Object.keys(groups).forEach(key => {
+        const g = groups[key];
+        const grp = document.createElement("div");
+        grp.className = "industry-group";
+        let html = `<div class="ig-head">
+            <span class="ig-icon">${iconByKey[key] || "🧭"}</span>
+            <span class="ig-name">${g.name}</span>
+            <span class="ig-line"></span>
+          </div>`;
+        g.items.forEach(item => {
+          const isChosen = item.idx === chosenIndex;
+          html += `
+            <div class="path${isChosen ? " chosen" : ""}" onclick="choose(${item.idx})">
+              <div class="radio"></div>
+              <div class="path-body">
+                <div class="path-role">${item.role}</div>
+                <div class="path-fam">${item.family}</div>
+              </div>
+              <span class="path-badge">Exploring first</span>
+            </div>`;
+        });
+        grp.innerHTML = html;
+        container.appendChild(grp);
+      });
+
+      updateBar();
+    }
+
+    function choose(idx) {
+      chosenIndex = idx;
+      render();
+    }
+
+    function updateBar() {
+      const total = selections.length;
+      const note = document.getElementById("queue-note");
+      if (chosenIndex === -1) {
+        document.getElementById("action-info").textContent = "Choose one path to begin";
+        document.getElementById("action-hint").textContent = `${total} path${total===1?"":"s"} saved in total.`;
+        document.getElementById("go-btn").disabled = true;
+        note.innerHTML = `You have <strong>${total}</strong> path${total===1?"":"s"} saved. Pick the first one to explore — the others will be waiting when you come back.`;
+      } else {
+        const chosen = selections[chosenIndex];
+        const remaining = total - 1;
+        document.getElementById("action-info").textContent = `First: ${chosen.role}`;
+        document.getElementById("action-hint").textContent = remaining > 0 ? `${remaining} more will wait their turn.` : "This is your only path.";
+        document.getElementById("go-btn").disabled = false;
+        note.innerHTML = `Starting with <strong>${chosen.role}</strong>${remaining>0?` — <strong>${remaining}</strong> other path${remaining===1?"":"s"} will wait in your queue.`:`.`}`;
+      }
+    }
+
+    function openInCanvas() {
+      if (chosenIndex === -1) return;
+      const chosen = selections[chosenIndex];
+      // hand the single chosen path to the canvas
+      userStore.set("canvas_current_path", JSON.stringify(chosen));
+      // build the "waiting" queue = everything except the chosen one
+      const queue = selections.filter((_, i) => i !== chosenIndex);
+      userStore.set("canvas_queue", JSON.stringify(queue));
+      window.location.href = "canvas.html";
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CareerMAP — Content Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#13151a;--panel:#1a1d24;--panel2:#21252e;--line:#2c313c;
+    --text:#e8e9ec;--muted:#8a90a0;--faint:#5a6072;
+    --accent:#5b9cff;--accent-soft:rgba(91,156,255,.12);
+    --green:#4caf7e;--amber:#e0a83c;--red:#e06a6a;--red-soft:rgba(224,106,106,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Spline Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;font-size:14px;}
+  .mono{font-family:'Spline Sans Mono',monospace;}
+
+  .topbar{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--line);background:var(--panel);}
+  .brand{font-weight:700;font-size:15px;letter-spacing:.02em;}
+  .brand b{color:var(--accent);}
+  .topbar-actions{display:flex;gap:10px;align-items:center;}
+  .status{font-size:12px;color:var(--muted);margin-right:8px;}
+  .status.dirty{color:var(--amber);}
+  .status.saved{color:var(--green);}
+  .btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:7px;padding:8px 14px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;}
+  .btn:hover{border-color:var(--accent);}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#0a0d14;}
+  .btn-primary:hover{opacity:.9;}
+  .btn-danger{color:var(--red);border-color:transparent;background:transparent;}
+  .btn-danger:hover{background:var(--red-soft);border-color:var(--red);}
+  .btn-sm{padding:5px 10px;font-size:12px;}
+
+  .layout{display:grid;grid-template-columns:230px 250px 1fr;height:calc(100vh - 54px);}
+  .col{overflow-y:auto;border-right:1px solid var(--line);}
+  .col-head{position:sticky;top:0;background:var(--panel);padding:11px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;z-index:2;}
+  .col-head .add{color:var(--accent);cursor:pointer;font-size:16px;line-height:1;}
+
+  .item{padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);display:flex;align-items:center;gap:9px;transition:background .1s;}
+  .item:hover{background:var(--panel2);}
+  .item.active{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent);}
+  .item .ico{font-size:15px;}
+  .item .lbl{flex:1;font-weight:500;line-height:1.25;}
+  .item .cnt{font-size:11px;color:var(--faint);}
+  .item.disabled .lbl{color:var(--faint);text-decoration:line-through;}
+
+  .editor{overflow-y:auto;padding:24px 30px 80px;background:var(--bg);}
+  .editor-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--faint);text-align:center;flex-direction:column;gap:8px;}
+  .crumb{font-size:12px;color:var(--muted);margin-bottom:4px;}
+  .crumb b{color:var(--text);}
+  .ed-title{font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);}
+
+  .field{margin-bottom:16px;}
+  .field-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+  .field-key{font-size:12px;font-weight:600;color:var(--muted);font-family:'Spline Sans Mono',monospace;}
+  .field-del{color:var(--faint);cursor:pointer;font-size:12px;border:none;background:none;}
+  .field-del:hover{color:var(--red);}
+  input.f,textarea.f,select.f{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:14px;outline:none;resize:vertical;line-height:1.5;}
+  input.f:focus,textarea.f:focus{border-color:var(--accent);}
+  .f.toggle{display:flex;align-items:center;gap:8px;cursor:pointer;width:auto;padding:0;border:none;background:none;}
+  .switch{width:38px;height:22px;border-radius:20px;background:var(--line);position:relative;transition:.15s;flex-shrink:0;}
+  .switch.on{background:var(--green);}
+  .switch::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.15s;}
+  .switch.on::after{left:19px;}
+
+  .addfield{margin-top:20px;padding:16px;border:1px dashed var(--line);border-radius:9px;background:var(--panel);}
+  .addfield h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:10px;}
+  .addfield-row{display:flex;gap:8px;}
+  .addfield-row input{flex:1;}
+  .quickfields{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .qf{font-size:11px;padding:4px 9px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;color:var(--muted);}
+  .qf:hover{border-color:var(--accent);color:var(--accent);}
+
+  .section-divider{margin:24px 0 14px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);border-top:1px solid var(--line);padding-top:14px;}
+  .login{display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:14px;}
+  .login input{width:280px;}
+  .hidden{display:none!important;}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px 20px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:100;opacity:0;transition:.2s;pointer-events:none;}
+  .toast.show{opacity:1;}
+  .toast.err{border-color:var(--red);color:var(--red);}
+  .toast.ok{border-color:var(--green);color:var(--green);}
+</style>
+</head>
+<body>
+
+<div id="app" class="hidden">
+  <div class="topbar">
+    <div class="brand">Career<b>MAP</b> · Content Admin</div>
+    <div class="topbar-actions">
+      <span class="status" id="status">Loaded</span>
+      <button class="btn" onclick="reloadData()">Reload</button>
+      <button class="btn" onclick="downloadJSON()">Download JSON</button>
+      <button class="btn btn-primary" onclick="saveData()" id="saveBtn">Save to server</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- WORLDS -->
+    <div class="col">
+      <div class="col-head">Worlds <span class="add" title="Add world" onclick="addWorld()">+</span></div>
+      <div id="worlds"></div>
+    </div>
+    <!-- FAMILIES -->
+    <div class="col">
+      <div class="col-head">Families <span class="add" title="Add family" onclick="addFamily()">+</span></div>
+      <div id="families"></div>
+    </div>
+    <!-- EDITOR -->
+    <div class="editor" id="editor">
+      <div class="editor-empty">Select a world, then a family, then a role to edit.<br>Or edit the world / family details directly.</div>
+    </div>
+  </div>
+</div>
+
+<div id="login" class="login">
+  <div class="brand" style="font-size:18px;">Career<b style="color:var(--accent)">MAP</b> Admin</div>
+  <p style="color:var(--muted);font-size:13px;">This area is admin-only. Make sure you're logged in.</p>
+  <button class="btn btn-primary" onclick="boot()">Enter Admin</button>
+  <p id="loginerr" style="color:var(--red);font-size:12px;"></p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+  const token = localStorage.getItem("token");
+  // editing target: which world/family/role is selected
+  let DATA = null;
+  let wi = -1, fi = -1, ri = -1;   // indices: world, family, role
+  let dirty = false;
+
+  // Fields that get special widgets; everything else is treated as text.
+  const BOOL_FIELDS = ["enabled"];
+  const LONG_FIELDS = ["intro","one_thing","wont_give","description","reality","day_to_day","blurb","where_it_leads","needs","path_in"];
+  // suggested fields you can add with one click
+  const SUGGESTED = ["day_to_day","where_it_leads","needs","path_in","access","tag","cross_link"];
+
+  function setStatus(t, cls){ const s=document.getElementById("status"); s.textContent=t; s.className="status"+(cls?" "+cls:""); }
+  function markDirty(){ dirty=true; setStatus("Unsaved changes","dirty"); }
+  function toast(msg, kind){ const t=document.getElementById("toast"); t.textContent=msg; t.className="toast show "+(kind||""); setTimeout(()=>t.className="toast",2200); }
+
+  async function boot(){
+    if(!token){ document.getElementById("loginerr").textContent="No login token found. Log in to the main app first."; return; }
+    await loadData();
+  }
+
+  async function loadData(){
+    try{
+      const res = await fetch(`${Config.BACKEND_URL}/quiz/admin/industries`, {
+        headers:{ "Authorization":`Bearer ${token}` }
+      });
+      if(res.status===403){ document.getElementById("loginerr").textContent="Your account isn't an admin. Add your email to ADMIN_EMAILS on the server."; return; }
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      DATA = await res.json();
+      document.getElementById("login").classList.add("hidden");
+      document.getElementById("app").classList.remove("hidden");
+      setStatus("Loaded","saved");
+      renderWorlds(); renderFamilies(); renderEditor();
+    }catch(e){
+      document.getElementById("loginerr").textContent="Couldn't load content: "+e.message+". Is the backend running and the endpoint added?";
+    }
+  }
+  function reloadData(){ if(dirty && !confirm("Discard unsaved changes and reload?")) return; dirty=false; loadData(); }
+
+  // ---------- WORLDS ----------
+  function renderWorlds(){
+    const el=document.getElementById("worlds"); el.innerHTML="";
+    DATA.industries.forEach((ind,i)=>{
+      const d=document.createElement("div");
+      d.className="item"+(i===wi?" active":"")+(ind.enabled===false?" disabled":"");
+      const roles=(ind.families||[]).reduce((s,f)=>s+(f.roles||[]).length,0);
+      d.innerHTML=`<span class="ico">${ind.icon||"🗂️"}</span><span class="lbl">${ind.short||ind.name||"(unnamed)"}</span><span class="cnt">${(ind.families||[]).length}f·${roles}r</span>`;
+      d.onclick=()=>{ wi=i; fi=-1; ri=-1; renderWorlds(); renderFamilies(); renderEditor(); };
+      el.appendChild(d);
+    });
+  }
+  function addWorld(){
+    DATA.industries.push({key:"new_world_"+Date.now(),name:"New World",short:"New",icon:"🗂️",intro:"",one_thing:"",wont_give:"",enabled:true,families:[]});
+    wi=DATA.industries.length-1; fi=-1; ri=-1; markDirty(); renderWorlds(); renderFamilies(); renderEditor();
+  }
+
+  // ---------- FAMILIES ----------
+  function renderFamilies(){
+    const el=document.getElementById("families"); el.innerHTML="";
+    if(wi<0){ el.innerHTML='<div style="padding:14px;color:var(--faint);font-size:12px;">Pick a world →</div>'; return; }
+    (DATA.industries[wi].families||[]).forEach((fam,i)=>{
+      const d=document.createElement("div");
+      d.className="item"+(i===fi?" active":"");
+      d.innerHTML=`<span class="lbl">${fam.name||"(unnamed family)"}</span><span class="cnt">${(fam.roles||[]).length}</span>`;
+      d.onclick=()=>{ fi=i; ri=-1; renderFamilies(); renderEditor(); };
+      el.appendChild(d);
+    });
+  }
+  function addFamily(){
+    if(wi<0){ toast("Pick a world first","err"); return; }
+    DATA.industries[wi].families.push({name:"New Family",blurb:"",roles:[]});
+    fi=DATA.industries[wi].families.length-1; ri=-1; markDirty(); renderFamilies(); renderEditor();
+  }
+
+  // ---------- EDITOR ----------
+  function renderEditor(){
+    const el=document.getElementById("editor");
+    if(wi<0){ el.innerHTML='<div class="editor-empty">Select a world to begin.</div>'; return; }
+    const ind=DATA.industries[wi];
+
+    // WORLD-level editing (when no family selected)
+    if(fi<0){
+      el.innerHTML=`<div class="crumb">World</div>
+        <div class="ed-title">${ind.icon||""} ${ind.name||""}</div>`;
+      el.appendChild(fieldsFor(ind, ["key","name","short","icon","intro","one_thing","wont_give","enabled"], ()=>{renderWorlds();}));
+      el.appendChild(addFieldBox(ind));
+      return;
+    }
+
+    const fam=ind.families[fi];
+
+    // FAMILY header + role list + family fields
+    let html=`<div class="crumb"><b>${ind.short||ind.name}</b> › Family</div>
+      <div class="ed-title">${fam.name||"(family)"} <span class="pill">${(fam.roles||[]).length} roles</span></div>`;
+    el.innerHTML=html;
+
+    // family's own fields
+    el.appendChild(fieldsFor(fam, ["name","blurb"], ()=>{renderFamilies();}));
+    el.appendChild(addFieldBox(fam));
+
+    // ROLES section
+    const rd=document.createElement("div");
+    rd.className="section-divider"; rd.textContent="Roles in this family";
+    el.appendChild(rd);
+
+    (fam.roles||[]).forEach((role,i)=>{
+      const card=document.createElement("div");
+      card.style.cssText="border:1px solid var(--line);border-radius:9px;margin-bottom:10px;overflow:hidden;";
+      const open = i===ri;
+      const head=document.createElement("div");
+      head.style.cssText="padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--panel);";
+      head.innerHTML=`<span style="flex:1;font-weight:600;">${role.name||"(unnamed role)"}</span>
+        ${role.access?`<span class="pill">${role.access}</span>`:""}
+        <span style="color:var(--faint);font-size:12px;">${open?"▾":"▸"}</span>`;
+      head.onclick=()=>{ ri = open? -1 : i; renderEditor(); };
+      card.appendChild(head);
+
+      if(open){
+        const body=document.createElement("div");
+        body.style.cssText="padding:16px 14px;background:var(--bg);border-top:1px solid var(--line);";
+        // show ALL fields the role has (flexible), name first
+        const keys=Object.keys(role);
+        const ordered=["name",...keys.filter(k=>k!=="name")];
+        body.appendChild(fieldsFor(role, ordered, ()=>{renderEditor();}, true));
+        body.appendChild(addFieldBox(role));
+        const del=document.createElement("button");
+        del.className="btn btn-danger btn-sm"; del.style.marginTop="12px";
+        del.textContent="Delete this role";
+        del.onclick=()=>{ if(confirm("Delete role: "+(role.name||"")+"?")){ fam.roles.splice(i,1); ri=-1; markDirty(); renderFamilies(); renderEditor(); } };
+        body.appendChild(del);
+        card.appendChild(body);
+      }
+      el.appendChild(card);
+    });
+
+    const addRole=document.createElement("button");
+    addRole.className="btn btn-sm"; addRole.textContent="+ Add role";
+    addRole.onclick=()=>{ fam.roles.push({name:"New Role",description:"",reality:"",tag:"",cross_link:"",enabled:true}); ri=fam.roles.length-1; markDirty(); renderFamilies(); renderEditor(); };
+    el.appendChild(addRole);
+
+    const delFam=document.createElement("button");
+    delFam.className="btn btn-danger btn-sm"; delFam.style.marginLeft="8px"; delFam.textContent="Delete family";
+    delFam.onclick=()=>{ if(confirm("Delete family: "+(fam.name||"")+" and all its roles?")){ ind.families.splice(fi,1); fi=-1; ri=-1; markDirty(); renderFamilies(); renderEditor(); } };
+    el.appendChild(delFam);
+  }
+
+  // build editable fields for an object, given an ordered key list
+  function fieldsFor(obj, keys, onChangeExtra, includeAll){
+    const wrap=document.createElement("div");
+    const shown = includeAll ? keys : keys.filter(k=>k in obj || true); // for fixed objects we still show listed keys
+    shown.forEach(key=>{
+      if(!(key in obj)) obj[key] = BOOL_FIELDS.includes(key)? true : "";
+      const f=document.createElement("div"); f.className="field";
+      const row=document.createElement("div"); row.className="field-row";
+      row.innerHTML=`<span class="field-key">${key}</span>`;
+      // allow deleting custom (non-core) fields
+      const core=["name","key"];
+      if(!core.includes(key)){
+        const del=document.createElement("button"); del.className="field-del"; del.textContent="remove field";
+        del.onclick=()=>{ delete obj[key]; markDirty(); renderEditor(); };
+        row.appendChild(del);
+      }
+      f.appendChild(row);
+
+      if(BOOL_FIELDS.includes(key) || typeof obj[key]==="boolean"){
+        const t=document.createElement("div"); t.className="f toggle";
+        const sw=document.createElement("div"); sw.className="switch"+(obj[key]?" on":"");
+        const lab=document.createElement("span"); lab.style.color="var(--muted)"; lab.textContent=obj[key]?"Enabled / shown":"Disabled / hidden";
+        t.appendChild(sw); t.appendChild(lab);
+        t.onclick=()=>{ obj[key]=!obj[key]; markDirty(); sw.className="switch"+(obj[key]?" on":""); lab.textContent=obj[key]?"Enabled / shown":"Disabled / hidden"; if(onChangeExtra)onChangeExtra(); };
+        f.appendChild(t);
+      } else if(LONG_FIELDS.includes(key) || (typeof obj[key]==="string" && obj[key].length>60)){
+        const ta=document.createElement("textarea"); ta.className="f"; ta.rows=3; ta.value=obj[key]||"";
+        ta.oninput=()=>{ obj[key]=ta.value; markDirty(); };
+        ta.onblur=()=>{ if(onChangeExtra)onChangeExtra(); };
+        f.appendChild(ta);
+      } else {
+        const inp=document.createElement("input"); inp.className="f"; inp.value=obj[key]||"";
+        inp.oninput=()=>{ obj[key]=inp.value; markDirty(); };
+        inp.onblur=()=>{ if(onChangeExtra)onChangeExtra(); };
+        f.appendChild(inp);
+      }
+      wrap.appendChild(f);
+    });
+    return wrap;
+  }
+
+  // the "add a new field" box — the flexible-fields feature
+  function addFieldBox(obj){
+    const box=document.createElement("div"); box.className="addfield";
+    box.innerHTML=`<h4>Add a new field</h4>`;
+    const row=document.createElement("div"); row.className="addfield-row";
+    const inp=document.createElement("input"); inp.className="f"; inp.placeholder="field name (e.g. needs, day_to_day, salary_note)";
+    const btn=document.createElement("button"); btn.className="btn btn-sm"; btn.textContent="Add";
+    const doAdd=(name)=>{
+      let k=(name||inp.value).trim().toLowerCase().replace(/[^a-z0-9_]+/g,"_").replace(/^_+|_+$/g,"");
+      if(!k){ toast("Enter a field name","err"); return; }
+      if(k in obj){ toast("Field already exists","err"); return; }
+      obj[k]=""; markDirty(); renderEditor();
+    };
+    btn.onclick=()=>doAdd();
+    inp.onkeydown=(e)=>{ if(e.key==="Enter") doAdd(); };
+    row.appendChild(inp); row.appendChild(btn); box.appendChild(row);
+
+    const quick=document.createElement("div"); quick.className="quickfields";
+    SUGGESTED.forEach(s=>{ if(!(s in obj)){ const q=document.createElement("span"); q.className="qf"; q.textContent="+ "+s; q.onclick=()=>doAdd(s); quick.appendChild(q);} });
+    box.appendChild(quick);
+    return box;
+  }
+
+  // ---------- SAVE ----------
+  async function saveData(){
+    const btn=document.getElementById("saveBtn"); btn.disabled=true; btn.textContent="Saving…";
+    try{
+      const res=await fetch(`${Config.BACKEND_URL}/quiz/admin/industries`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
+        body:JSON.stringify(DATA)
+      });
+      const out=await res.json();
+      if(!res.ok) throw new Error(out.error||("HTTP "+res.status));
+      dirty=false; setStatus(`Saved · ${out.industries} worlds, ${out.roles} roles`,"saved");
+      toast("Saved to server ✓","ok");
+    }catch(e){
+      toast("Save failed: "+e.message,"err"); setStatus("Save failed","dirty");
+    }finally{ btn.disabled=false; btn.textContent="Save to server"; }
+  }
+
+  function downloadJSON(){
+    const blob=new Blob([JSON.stringify(DATA,null,2)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="industries.json"; a.click();
+  }
+
+  window.addEventListener("beforeunload",(e)=>{ if(dirty){ e.preventDefault(); e.returnValue=""; } });
+
+  // auto-boot if token present
+  if(token) boot(); 
+</script>
+</body>
+</html>

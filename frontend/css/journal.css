@@ -1,0 +1,78 @@
+/* 
+ * journal.css
+ * Additional styles specific to the journal/writing pages.
+ * Base journal styles (journal-page, journal-container, q-block etc.)
+ * already live in style.css — this file holds phase-specific overrides.
+ */
+
+/* ── Past phase accent colour (deep indigo) ─────────────────── */
+.phase-past .essay-input:focus {
+    border-left: 3px solid #4f46e5;
+}
+.phase-past .guide-trigger {
+    color: #4f46e5;
+}
+.phase-past .guide-content {
+    border-left: 3px solid #4f46e5;
+    background: #f8f9ff;
+}
+
+/* ── Present phase accent colour (warm amber) ───────────────── */
+.phase-present .essay-input:focus {
+    border-left: 3px solid #d97706;
+}
+.phase-present .guide-trigger {
+    color: #d97706;
+}
+.phase-present .guide-content {
+    border-left: 3px solid #d97706;
+    background: #fffbf0;
+}
+.phase-present .footer-tools .btn-primary {
+    background: #d97706;
+}
+.phase-present .footer-tools .btn-primary:hover {
+    background: #b45309;
+}
+
+/* ── Chapter progress dots ───────────────────────────────────── */
+.chapter-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+.chapter-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    transition: background 0.3s ease;
+}
+.chapter-dot.done {
+    background: #4f46e5;
+}
+.chapter-dot.done.present {
+    background: #d97706;
+}
+.chapter-dot.active {
+    width: 10px;
+    height: 10px;
+    background: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+.chapter-dot.active.present {
+    background: #d97706;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+}
+
+/* ── Autosave indicator ──────────────────────────────────────── */
+.autosave-indicator {
+    font-size: 12px;
+    color: #10b981;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    font-family: sans-serif;
+}
+.autosave-indicator.visible {
+    opacity: 1;
+}

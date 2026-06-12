@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Home — Career MAP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f6f4ef;--paper:#fffdf9;--text:#1a1822;--muted:#6a6678;--faint:#9a96a8;
+    --accent:#d4a93f;--accent-soft:rgba(212,169,63,.1);--border:#e7e3da;
+    --green:#1f9d6b;--cross:#3a6ea5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding-bottom:60px;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+  .top{padding:30px 0 26px;display:flex;align-items:center;justify-content:space-between;}
+  .brand{font-family:'Fraunces',serif;font-weight:600;font-size:18px;}
+  .brand b{color:var(--accent);}
+  .logout{font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:7px 14px;border-radius:20px;}
+  .logout:hover{border-color:var(--accent);}
+  .hero{padding:14px 0 30px;border-bottom:1px solid var(--border);margin-bottom:32px;}
+  .hello{font-size:14px;color:var(--accent);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px;}
+  .hero h1{font-family:'Fraunces',serif;font-size:40px;font-weight:600;line-height:1.1;margin-bottom:8px;}
+  .hero p{font-size:16px;color:var(--muted);}
+  .section{margin-bottom:40px;}
+  .section-label{font-family:'Fraunces',serif;font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.05em;text-transform:uppercase;margin-bottom:16px;}
+
+  /* THE FORK */
+  .fork{background:var(--paper);border:1px solid var(--border);border-radius:20px;padding:32px 28px;text-align:center;}
+  .fork h2{font-family:'Fraunces',serif;font-size:26px;font-weight:600;margin-bottom:10px;}
+  .fork p{font-size:15.5px;color:var(--muted);max-width:480px;margin:0 auto 24px;line-height:1.6;}
+  .fork-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:30px;padding:15px 30px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:.16s;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(212,169,63,.35);}
+  .btn-ghost{background:none;color:var(--muted);border:1px solid var(--border);border-radius:30px;padding:15px 28px;font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-block;transition:.16s;}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--text);}
+  .fork-note{font-size:13px;color:var(--faint);margin-top:18px;}
+
+  /* personality results */
+  .persona-card{background:var(--paper);border:1px solid var(--border);border-radius:18px;padding:26px;}
+  .persona-summary{font-size:16px;line-height:1.75;color:#2a2736;margin-bottom:18px;}
+  .traits{display:flex;flex-direction:column;gap:14px;}
+  .trait-top{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px;}
+  .trait-name{font-weight:600;}.trait-val{color:var(--muted);}
+  .bar{height:8px;background:var(--border);border-radius:10px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--accent);border-radius:10px;}
+  .persona-link{display:inline-block;margin-top:18px;font-size:14px;color:var(--cross);text-decoration:none;font-weight:600;}
+  .persona-link:hover{text-decoration:underline;}
+
+  /* "now explore" call-to-action after test */
+  .explore-cta{margin-top:18px;background:var(--accent-soft);border:1px solid var(--border);border-radius:16px;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .explore-cta-text{flex:1;min-width:220px;}
+  .explore-cta-text b{font-family:'Fraunces',serif;font-size:18px;font-weight:600;display:block;margin-bottom:4px;}
+  .explore-cta-text span{font-size:14px;color:var(--muted);}
+
+  /* selections */
+  .sel-grid{display:flex;flex-direction:column;gap:12px;}
+  .sel-card{background:var(--paper);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;transition:.16s;cursor:pointer;}
+  .sel-card:hover{border-color:var(--accent);box-shadow:0 6px 20px rgba(0,0,0,.06);transform:translateY(-1px);}
+  .sel-icon{font-size:30px;flex-shrink:0;}
+  .sel-body{flex:1;}
+  .sel-name{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:3px;}
+  .sel-count{font-size:13px;color:var(--muted);}
+  .sel-arrow{color:var(--accent);font-size:20px;}
+  .empty{background:var(--paper);border:1px dashed var(--border);border-radius:16px;padding:24px;text-align:center;color:var(--muted);font-size:15px;}
+  .empty a{color:var(--accent);font-weight:600;text-decoration:none;}
+
+  /* progress */
+  .prog-card{background:var(--paper);border:1px solid var(--border);border-radius:18px;padding:24px 26px;}
+  .stat{display:inline-block;margin-bottom:8px;}
+  .stat-num{font-family:'Fraunces',serif;font-size:34px;font-weight:600;color:var(--accent);line-height:1;}
+  .stat-label{font-size:13px;color:var(--muted);margin-top:6px;}
+  .steps{margin-top:18px;display:flex;flex-direction:column;gap:10px;}
+  .step{display:flex;align-items:center;gap:12px;font-size:14.5px;}
+  .step-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+  .step.done .step-dot{background:var(--green);border-color:var(--green);color:#fff;}
+  .step.done .step-text{color:var(--text);}
+  .step .step-text{color:var(--faint);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Career<b>MAP</b></div>
+    <a href="#" class="logout" id="logoutBtn">Log out</a>
+  </div>
+
+  <div class="hero">
+    <div class="hello">Your Home</div>
+    <h1 id="greeting">Welcome</h1>
+    <p id="status-line">This is your home base — everything about your journey lives here.</p>
+  </div>
+
+  <!-- ADAPTIVE: fork (before test) OR personality results + explore CTA (after test) -->
+  <div class="section">
+    <div class="section-label" id="persona-label">Get Started</div>
+    <div id="persona-zone"></div>
+  </div>
+
+  <!-- selections -->
+  <div class="section" id="selections-section" style="display:none;">
+    <div class="section-label">What You're Pursuing</div>
+    <div id="selections"></div>
+  </div>
+
+  <!-- progress -->
+  <div class="section">
+    <div class="section-label">Your Progress</div>
+    <div id="progress"></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="userstore.js"></script>
+  <script>
+  const ICONS={tech:"💻",manufacturing:"🏭",engineering:"⚙️",trades:"🔧",finance:"💰",economics:"📈",entrepreneurship:"🚀",healthcare:"🩺",academics:"🎓",creative:"🎨",government:"🏛️",agriculture:"🌱",sustainability:"⚡",retail:"🛒",hospitality:"🏨",athletics:"🏅",business:"📋"};
+
+  // ---- greeting: use the name from their intro profile ----
+  (function showName(){
+    let name="";
+    try{ name=(JSON.parse(userStore.get("user_profile")||"{}").name||"").trim(); }catch(e){}
+    if(!name){ // fallback to account email's first part if no profile name
+      try{ const em=(JSON.parse(localStorage.getItem("user")||"{}").email||""); name=em?em.split("@")[0]:""; }catch(e){}
+    }
+    const g=document.getElementById("greeting");
+    if(g) g.textContent = name ? `Welcome, ${name}` : "Welcome";
+  })();
+
+  // ---- read state ----
+  function getReport(){ try{return JSON.parse(userStore.get("persona_report")||"null");}catch(e){return null;} }
+  function getScores(){ try{return JSON.parse(userStore.get("dna_scores")||"null");}catch(e){return null;} }
+  function getPicks(){ try{return JSON.parse(userStore.get("explore_selections_raw")||"{}");}catch(e){return {};} }
+  function hasTest(){ return !!(getReport()||getScores()); }
+  function pickedWorlds(){ const p=getPicks(); return Object.keys(p).filter(k=>p[k]&&Object.keys(p[k]).length>0); }
+
+  // ---- PERSONA ZONE: the adaptive heart of the page ----
+  function renderPersonaZone(){
+    const label=document.getElementById("persona-label");
+    const zone=document.getElementById("persona-zone");
+
+    if(!hasTest()){
+      // BEFORE TEST → the fork
+      label.textContent="Get Started";
+      zone.innerHTML=`
+        <div class="fork">
+          <h2>How would you like to begin?</h2>
+          <p>Take a short personality test and we'll suggest the career paths that genuinely fit who you are — or skip it and explore all the industries on your own.</p>
+          <div class="fork-btns">
+            <a class="btn-primary" href="quiz.html">Take the personality test →</a>
+            <a class="btn-ghost" href="world.html">Explore on my own</a>
+          </div>
+          <div class="fork-note">The test takes a few minutes. You can always explore freely afterwards.</div>
+        </div>`;
+      return;
+    }
+
+    // AFTER TEST → a CLEAN summary card + button to the dedicated analysis page
+    // (We intentionally do NOT dump all the trait bars here — the full breakdown
+    //  lives on analysis.html. The home page stays tidy.)
+    label.textContent="Who You Are";
+    let html=`<div class="persona-card">`;
+    html+=`<div class="persona-summary">You've completed your personality test. Your full breakdown — your traits, strengths, and what they mean for your career — is ready on your analysis page.</div>`;
+    html+=`<a class="btn-primary" href="analysis.html" style="text-decoration:none;">See my full analysis →</a>`;
+    html+=`</div>`;
+
+    // the "now explore industries" nudge (next step in the loop)
+    html+=`<div class="explore-cta">
+      <div class="explore-cta-text"><b>Now, explore your industries</b><span>Based on who you are, find the worlds and roles that fit you.</span></div>
+      <a class="btn-primary" href="world.html">Explore industries →</a>
+    </div>`;
+    zone.innerHTML=html;
+  }
+
+  // ---- SELECTIONS ----
+  function renderSelections(){
+    const section=document.getElementById("selections-section");
+    const box=document.getElementById("selections");
+    const worlds=pickedWorlds();
+    if(worlds.length===0){ section.style.display="none"; return; }
+    section.style.display="block";
+    let html=`<div class="sel-grid">`;
+    const picks=getPicks();
+    worlds.forEach(key=>{
+      const count=Object.keys(picks[key]).length;
+      const icon=ICONS[key]||"🗂️";
+      const name=key.charAt(0).toUpperCase()+key.slice(1);
+      html+=`<div class="sel-card" onclick="openCanvas('${key}')">
+        <div class="sel-icon">${icon}</div>
+        <div class="sel-body"><div class="sel-name">${name}</div>
+          <div class="sel-count">${count} path${count===1?"":"s"} selected — continue your learning</div></div>
+        <div class="sel-arrow">→</div></div>`;
+    });
+    html+=`</div>`;
+    box.innerHTML=html;
+  }
+
+  // The canvas works on ONE specific role at a time, chosen via gather.html.
+  // So clicking an industry sends the user to gather, where they pick which
+  // saved role to work on — which then opens the canvas correctly.
+  function openCanvas(key){
+    userStore.set("explore_current", key);
+    window.location.href="gather.html";
+  }
+
+  // ---- PROGRESS ----
+  function renderProgress(){
+    const box=document.getElementById("progress");
+    const q=hasTest();
+    const p=pickedWorlds().length>0;
+    const c=!!userStore.get("canvas_queue")||!!userStore.get("canvas_current_path");
+    const points=parseInt(userStore.get("points_total")||"0",10);
+    box.innerHTML=`<div class="prog-card">
+      <div class="stat"><div class="stat-num">${points}</div><div class="stat-label">Points earned</div></div>
+      <div class="steps">
+        <div class="step ${q?"done":""}"><div class="step-dot">${q?"✓":"1"}</div><span class="step-text">Took the personality test ${q?"":"(optional)"}</span></div>
+        <div class="step ${p?"done":""}"><div class="step-dot">${p?"✓":"2"}</div><span class="step-text">Selected career paths to explore</span></div>
+        <div class="step ${c?"done":""}"><div class="step-dot">${c?"✓":"3"}</div><span class="step-text">Started building a learning roadmap</span></div>
+      </div></div>`;
+  }
+
+  document.getElementById("logoutBtn").onclick=(e)=>{e.preventDefault();localStorage.removeItem("token");window.location.href="index.html";};
+
+  renderPersonaZone();
+  renderSelections();
+  renderProgress();
+</script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+/* ── Reset & base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #f5f4f0;
+  --surface:      #ffffff;
+  --border:       #e2e0da;
+  --text-primary: #1a1a1a;
+  --text-muted:   #6b6b6b;
+  --accent:       #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-light: #eef2ff;
+  --success:      #10b981;
+  --error:        #ef4444;
+  --error-bg:     #fef2f2;
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    16px;
+  --shadow:       0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg:    0 8px 32px rgba(0,0,0,0.12);
+
+  /* Trait colours */
+  --O: #10b981;   /* Openness        — green  */
+  --C: #3b82f6;   /* Conscientiousness— blue  */
+  --E: #f59e0b;   /* Extraversion    — amber  */
+  --A: #ec4899;   /* Agreeableness   — pink   */
+  --N: #8b5cf6;   /* Neuroticism     — purple */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.hidden { display: none !important; }
+
+/* ── Auth page ────────────────────────────────────────────── */
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logo-mark {
+  width: 52px; height: 52px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 14px;
+  font-size: 24px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.auth-logo h1 { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+.auth-logo p  { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+.auth-tabs {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all .15s;
+}
+.auth-tab.active {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.error-banner {
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 1rem;
+}
+
+.auth-form { display: flex; flex-direction: column; gap: 1rem; }
+
+.field-group { display: flex; flex-direction: column; gap: 6px; }
+.field-group label {
+  font-size: 13px; font-weight: 500; color: var(--text-primary);
+}
+.field-group .hint { font-weight: 400; color: var(--text-muted); }
+
+.field-group input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  color: var(--text-primary);
+  background: var(--surface);
+  transition: border-color .15s;
+  outline: none;
+}
+.field-group input:focus { border-color: var(--accent); }
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn-primary {
+  padding: 11px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-primary:hover    { background: var(--accent-hover); }
+.btn-primary:active   { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-ghost {
+  padding: 9px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-ghost:hover    { background: var(--bg); }
+.btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Quiz nav ────────────────────────────────────────────── */
+.quiz-nav {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 2rem;
+}
+.nav-logo { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-user  { font-size: 13px; color: var(--text-muted); }
+
+/* ── Loading screen ─────────────────────────────────────── */
+.loading-screen {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: calc(100vh - 60px);
+  gap: 16px; color: var(--text-muted);
+}
+
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+/* ── Quiz container ─────────────────────────────────────── */
+.quiz-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+/* Progress bar */
+.progress-wrap { margin-bottom: 2rem; }
+.progress-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.progress-meta span { font-size: 13px; color: var(--text-muted); }
+.trait-badge {
+  font-size: 12px; font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--accent-light);
+  color: var(--accent);
+}
+.trait-badge {
+  display: none !important; /* This hides the 'Neuroticism', 'Openness', etc. badges */
+  /* Keep the rest of your styling as is */
+}
+.progress-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+
+/* Question card */
+.question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 2.5rem 2rem;
+}
+
+.question-number {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+}
+
+.question-text {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.55;
+  margin-bottom: 2.5rem;
+}
+
+/* Rating */
+.rating-wrap { margin-bottom: 2.5rem; }
+.rating-labels {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.rating-buttons {
+  display: flex; gap: 10px; justify-content: center;
+}
+
+.rating-btn {
+  width: 56px; height: 56px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.rating-btn:hover  { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.rating-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+/* Nav buttons */
+.nav-buttons {
+  display: flex; justify-content: space-between;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Done screen ─────────────────────────────────────────── */
+.done-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: calc(100vh - 60px);
+  padding: 2rem;
+}
+
+.done-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 3rem 2.5rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.done-icon {
+  width: 64px; height: 64px;
+  background: #d1fae5;
+  color: var(--success);
+  border-radius: 50%;
+  font-size: 28px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+.done-card h2 { font-size: 26px; font-weight: 700; margin-bottom: 12px; }
+.done-card  p { font-size: 15px; color: var(--text-muted); margin-bottom: 1.5rem; }
+.done-sub     { font-size: 13px; color: var(--text-muted); }
+
+.trait-scores {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin: 1.5rem 0;
+  text-align: left;
+}
+.trait-score-row {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+.trait-score-name  { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.trait-score-value { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.trait-score-bar   { height: 4px; border-radius: 2px; margin-top: 6px; }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .question-text { font-size: 17px; }
+  .rating-btn    { width: 46px; height: 46px; font-size: 16px; }
+  .quiz-nav      { padding: 12px 1rem; }
+  .question-card { padding: 1.75rem 1.25rem; }
+}
+
+/* ── Journal Sanctuary Layout ────────────────────────────── */
+.journal-page {
+  background-color: #fdfdfb; /* Slightly warmer than pure white for eye comfort */
+  color: #2c2c2c;
+  font-family: 'Georgia', serif; /* Serif is scientifically easier for long-form reading */
+}
+
+.journal-container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 80px 20px 150px; /* Large bottom padding for the floating footer */
+}
+
+/* ── Chapter Header ──────────────────────────────────────── */
+.chapter-intro {
+  text-align: center;
+  margin-bottom: 60px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 40px;
+}
+
+.chapter-intro h1 {
+  font-size: 32px;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin-bottom: 15px;
+}
+
+.intro-text {
+  font-size: 18px;
+  color: #666;
+  font-style: italic;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Question Blocks ─────────────────────────────────────── */
+.q-block {
+  margin-bottom: 80px;
+  animation: fadeIn 0.8s ease;
+}
+
+.q-text {
+  display: block;
+  font-size: 22px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+/* ── Guides (Why / How) ──────────────────────────────────── */
+.guide-trigger {
+  font-size: 13px;
+  color: #4f46e5;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-bottom: 10px;
+  display: inline-block;
+  font-family: sans-serif;
+}
+
+.guide-content {
+  background: #f8f9ff;
+  border-left: 3px solid #4f46e5;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 0 8px 8px 0;
+  font-family: sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.guide-content p { margin-bottom: 8px; }
+
+/* ── The Writing Area ────────────────────────────────────── */
+.essay-input {
+  width: 100%;
+  min-height: 150px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid #e0e0e0;
+  padding: 10px 25px;
+  font-size: 19px;
+  line-height: 1.8;
+  color: #333;
+  resize: none;
+  transition: border-left 0.3s ease;
+}
+
+.essay-input:focus {
+  outline: none;
+  border-left: 3px solid #4f46e5;
+}
+
+.essay-input::placeholder {
+  color: #ccc;
+  font-style: italic;
+}
+
+/* ── Floating Progress Footer ────────────────────────────── */
+.footer-tools {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #eee;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+#chapter-label {
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #999;
+}
+
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hide helper */
+.hidden { display: none !important; }
