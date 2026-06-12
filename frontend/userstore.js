@@ -121,4 +121,13 @@
   };
 
   global.userStore = userStore;
+
+  // CRITICAL: pages navigate away constantly (window.location.href), which
+  // would cancel the debounced push before it fires. Flush immediately
+  // whenever the page is being hidden/unloaded so the journey reaches the
+  // server every time. keepalive:true lets the request finish during unload.
+  global.addEventListener("pagehide", function () { userStore.flush(); });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") userStore.flush();
+  });
 })(window);
